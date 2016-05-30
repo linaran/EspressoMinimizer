@@ -2,6 +2,9 @@ package espresso;
 
 import java.util.Arrays;
 
+import static espresso.InputState.*;
+import static espresso.OutputState.*;
+
 /**
  * By definition cube consists of its input part and output part.<br/>
  * <br/>
@@ -9,40 +12,135 @@ import java.util.Arrays;
  * the output part consists of {@link OutputState}s.
  */
 public class Cube {
-  private InputState[] inputPart;
-  private OutputState[] outputPart;
+  public InputState[] input;
+  public OutputState[] output;
 
   public Cube(InputState[] input, OutputState[] output) {
-    inputPart = input;
-    outputPart = output;
+    this.input = input;
+    this.output = output;
   }
 
-  public int getInputCount() {
-    return inputPart.length;
+  @Override
+  public String toString() {
+    return Arrays.toString(input) + " " + Arrays.toString(output);
   }
 
-  public int getOutputCount() {
-    return outputPart.length;
+//////////////////////////////////////////////////////////////////////////////
+//  Cube operations
+//////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Method returns a new cube that represents an intersection
+   * between this cube and another cube (given parameter).
+   *
+   * @param other {@link Cube}.
+   * @return {@link Cube}.
+   */
+  public Cube and(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    InputState[] inputStates = new InputState[input.length];
+    OutputState[] outputStates = new OutputState[output.length];
+
+    for (int i = 0; i < inputStates.length; i++)
+      inputStates[i] = InputState.and(input[i], other.input[i]);
+    for (int i = 0; i < outputStates.length; i++)
+      outputStates[i] = OutputState.and(output[i], other.output[i]);
+
+    return new Cube(inputStates, outputStates);
   }
 
   /**
-   * Method returns the input part of the cube.
-   * Freely use this object as a simple array.
+   * Method returns the number of {@link InputState#EMPTY} in the
+   * intersection of this cube and another cube (given parameter).
    *
-   * @return Array of {@link InputState}s.
+   * @param other {@link Cube}.
+   * @return primitive int.
    */
-  public InputState[] input() {
-    return inputPart;
+  public int inputDistance(Cube other) {
+    int retValue = 0;
+
+    for (int i = 0; i < input.length; i++)
+      if (InputState.and(input[i], other.input[i]) == EMPTY)
+        retValue++;
+
+    return retValue;
   }
 
   /**
-   * Method returns the output part of the cube.
-   * Freely use this object as a simple array.
+   * Method returns the number of {@link OutputState#NOT_OUTPUT} in the
+   * intersection of this cube and another cube (given parameter).
    *
-   * @return Array of {@link OutputState}s.
+   * @param other {@link Cube}.
+   * @return primitive int.
    */
-  public OutputState[] output() {
-    return outputPart;
+  public int outputDistance(Cube other) {
+    int retValue = 0;
+
+    for (int i = 0; i < output.length; i++)
+      if (OutputState.and(output[i], other.output[i]) != OUTPUT)
+        retValue++;
+
+    return retValue;
+  }
+
+  /**
+   * Method returns the number of {@link InputState#EMPTY} and {@link OutputState#NOT_OUTPUT}
+   * in the intersection of this cube and another cube (given parameter).
+   *
+   * @param other {@link Cube}.
+   * @return primitive int.
+   */
+  public int distance(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    return inputDistance(other) + outputDistance(other);
+  }
+
+  /**
+   * Consensus between cube <b>a</b> and cube <b>b</b> returns a
+   * cube that has one "leg" in <b>a</b> and another in <b>b</b>.<br/>
+   * It's sort of a bridge between <b>a</b> and <b>b</b>.<br/>
+   * <br/>
+   * Note that the existence of a consensus depends on the distance
+   * between cubes. If the distance is greater than 2 then this method
+   * will return null.
+   *
+   * @param other {@link Cube}.
+   * @return {@link Cube}.
+   */
+  public Cube consensus(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    int inputDistance = inputDistance(other);
+    int outputDistance = outputDistance(other);
+    int distance = inputDistance + outputDistance;
+
+    if (distance == 0)
+      return and(other);
+    else if (distance >= 2)
+      return null;
+
+    Cube retValue = and(other);
+
+    if (inputDistance == 1 && outputDistance == 0) {
+      for (int i = 0; i < retValue.input.length; i++)
+        if (retValue.input[i] == EMPTY)
+          retValue.input[i] = DONTCARE;
+      return retValue;
+    }
+
+    if (inputDistance == 0 && outputDistance == 1) {
+      for (int i = 0; i < retValue.output.length; i++)
+        if (output[i] == OUTPUT || other.output[i] == OUTPUT)
+          retValue.output[i] = OUTPUT;
+      return retValue;
+    }
+
+    throw new UnsupportedOperationException("Likely a bug in Cube#distance, inputDistance, outputDistance.");
   }
 
   /**
@@ -59,25 +157,20 @@ public class Cube {
     boolean emptyInput = false;
     boolean emptyOutput = true;
 
-    for (InputState state : cube.inputPart)
-      if (state == InputState.EMPTY) {
+    for (InputState state : cube.input)
+      if (state == EMPTY) {
         emptyInput = true;
         break;
       }
 
     if (emptyInput) return true;
 
-    for (OutputState state : cube.outputPart)
-      if (state != OutputState.NOT_OUTPUT) {
+    for (OutputState state : cube.output)
+      if (state != NOT_OUTPUT) {
         emptyOutput = false;
         break;
       }
 
     return emptyOutput;
-  }
-
-  @Override
-  public String toString() {
-    return Arrays.toString(inputPart) + " " + Arrays.toString(outputPart);
   }
 }
