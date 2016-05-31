@@ -15,6 +15,12 @@ public class Cube {
   public InputState[] input;
   public OutputState[] output;
 
+  /**
+   * Reference copy constructor.
+   *
+   * @param input  array of {@link InputState}s.
+   * @param output array of {@link OutputState}s.
+   */
   public Cube(InputState[] input, OutputState[] output) {
     this.input = input;
     this.output = output;
@@ -31,7 +37,9 @@ public class Cube {
 
   /**
    * Method returns a new cube that represents an intersection
-   * between this cube and another cube (given parameter).
+   * between this cube and another cube (given parameter).<br/>
+   * Note: This operation can produce an {@link InputState#EMPTY} cube.
+   * In case an empty cube is noticed this method will return null.
    *
    * @param other {@link Cube}.
    * @return {@link Cube}.
@@ -43,12 +51,19 @@ public class Cube {
     InputState[] inputStates = new InputState[input.length];
     OutputState[] outputStates = new OutputState[output.length];
 
-    for (int i = 0; i < inputStates.length; i++)
+    for (int i = 0; i < inputStates.length; i++) {
       inputStates[i] = InputState.and(input[i], other.input[i]);
-    for (int i = 0; i < outputStates.length; i++)
-      outputStates[i] = OutputState.and(output[i], other.output[i]);
+      if (inputStates[i] == EMPTY) return null;
+    }
 
-    return new Cube(inputStates, outputStates);
+    boolean isEmpty = true;
+    for (int i = 0; i < outputStates.length; i++) {
+      outputStates[i] = OutputState.and(output[i], other.output[i]);
+      if (outputStates[i] != NOT_OUTPUT && isEmpty) isEmpty = false;
+    }
+
+    if (isEmpty) return null;
+    else return new Cube(inputStates, outputStates);
   }
 
   /**
