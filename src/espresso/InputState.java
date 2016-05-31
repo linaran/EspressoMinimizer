@@ -1,5 +1,7 @@
 package espresso;
 
+import static espresso.Containment.*;
+
 /**
  * Value representations for input entries in {@link Cube}.
  */
@@ -11,15 +13,15 @@ public enum InputState {
 
   private int numState;
 
+  InputState(int numState) {
+    this.numState = numState;
+  }
+
   private static final InputState[][] andInputMatrix = new InputState[][]{
       {ZERO, EMPTY, ZERO},
       {EMPTY, ONE, ONE},
       {ZERO, ONE, DONTCARE}
   };
-
-  InputState(int numState) {
-    this.numState = numState;
-  }
 
   public int valueOf() {
     return numState;
@@ -30,5 +32,70 @@ public enum InputState {
       throw new IllegalArgumentException("One of the input states are empty");
 
     return andInputMatrix[o1.valueOf()][o2.valueOf()];
+  }
+
+  /**
+   * Method tells whether this {@link InputState} contains the other
+   * {@link InputState} (given parameter).<br/>
+   * <br/>
+   * Note: If the method returns false then that means this object either
+   * strictly contains or doesn't contain the given parameter.<br/>
+   * For general containment refer to {@link InputState#generalContains(InputState)}.
+   *
+   * @param other {@link InputState}.
+   * @return true if this object contains the given parameter.
+   * @see Containment
+   */
+  public boolean contains(InputState other) {
+    return inputContainment[numState][other.valueOf()] == CONTAIN;
+  }
+
+  /**
+   * Method tells whether this {@link InputState} strictly contains the other
+   * {@link InputState} (given parameter).<br/>
+   * <br/>
+   * Note: If the method returns false then that means this object either
+   * contains or doesn't contain the given parameter.<br/>
+   * For general containment refer to {@link InputState#generalContains(InputState)}.
+   *
+   * @param other {@link InputState}.
+   * @return true if this object strictly contains the given parameter.
+   * @see Containment
+   */
+  public boolean strictContains(InputState other) {
+    return inputContainment[numState][other.valueOf()] == STRICT_CONTAIN;
+  }
+
+  /**
+   * Method tells whether this {@link InputState} doesn't contain the other
+   * {@link InputState} (given parameter).<br/>
+   * <br/>
+   * Note: If the method returns false then that means this object either
+   * contains or strictly contains the given parameter.<br/>
+   * For general containment refer to {@link InputState#generalContains(InputState)}.
+   *
+   * @param other {@link InputState}.
+   * @return true if this object doesn't contain the given parameter.
+   * @see Containment
+   */
+  public boolean notContains(InputState other) {
+    return inputContainment[numState][other.valueOf()] == NOT_CONTAIN;
+  }
+
+  /**
+   * Method tells whether this {@link InputState} contains OR strictly contains
+   * the other {@link InputState} (given parameter).<br/>
+   * <br/>
+   * Note: If the method returns false then that means this object does not
+   * contain the given parameter at all. Among all containment methods this
+   * is the intuitive one.
+   *
+   * @param other {@link InputState}.
+   * @return {@link InputState}.
+   * @see Containment
+   */
+  public boolean generalContains(InputState other) {
+    Containment containment = inputContainment[numState][other.valueOf()];
+    return containment == CONTAIN || containment == STRICT_CONTAIN;
   }
 }

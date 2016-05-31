@@ -143,6 +143,29 @@ public class Cube {
     throw new UnsupportedOperationException("Likely a bug in Cube#distance, inputDistance, outputDistance.");
   }
 
+//  TODO: contain, strictContain, notContain if needed.
+
+  /**
+   * Method tells whether this cube {@link Containment#CONTAIN} or {@link Containment#STRICT_CONTAIN}
+   * the other cube (given parameter).
+   *
+   * @param other {@link Cube}.
+   * @return true if this cube contains or strictly contains the other cube.
+   */
+  public boolean generalContain(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    for (int i = 0; i < input.length; i++)
+      if (!input[i].generalContains(other.input[i]))
+        return false;
+    for (int i = 0; i < output.length; i++)
+      if (!output[i].generalContains(other.output[i]))
+        return false;
+
+    return true;
+  }
+
   /**
    * A {@link Cube} is regarded empty when one of the input parts
    * is {@link InputState#EMPTY} or all of the output parts are {@link OutputState#NOT_OUTPUT}.
