@@ -25,7 +25,17 @@ public enum OutputState {
   }
 
   public static OutputState and(OutputState o1, OutputState o2) {
+//    TODO: Refactor to work as OUTPUT.and(NOT_OUTPUT)
     return andOutputMatrix[o1.valueOf() - 3][o2.valueOf() - 3];
+  }
+
+  /**
+   * Complement of {@link OutputState#NOT_OUTPUT} is {@link OutputState#OUTPUT}.
+   *
+   * @return {@link OutputState}.
+   */
+  public OutputState complement() {
+    return this == NOT_OUTPUT ? OUTPUT : NOT_OUTPUT;
   }
 
   /**

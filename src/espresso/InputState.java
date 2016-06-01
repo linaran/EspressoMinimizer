@@ -28,10 +28,24 @@ public enum InputState {
   }
 
   public static InputState and(InputState o1, InputState o2) {
+//    TODO: Refactor to work as ONE.and(ZERO);
     if (o1 == EMPTY || o2 == EMPTY)
-      throw new IllegalArgumentException("One of the input states are empty");
+      throw new IllegalArgumentException("One of the input states are empty.");
 
     return andInputMatrix[o1.valueOf()][o2.valueOf()];
+  }
+
+  /**
+   * Complement of {@link InputState#DONTCARE} is {@link InputState#EMPTY}.
+   * Complement of {@link InputState#ONE} is {@link InputState#ZERO}.
+   *
+   * @return {@link InputState}.
+   */
+  public InputState complement() {
+    if (this == EMPTY) return DONTCARE;
+    if (this == DONTCARE) return EMPTY;
+
+    return this == ONE ? ZERO : ONE;
   }
 
   /**
