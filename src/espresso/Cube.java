@@ -9,18 +9,14 @@ import static espresso.OutputState.*;
  * By definition cube consists of its input part and output part.<br/>
  * <br/>
  * Both parts are simple arrays. Input part consists of {@link InputState}s and
- * the output part consists of {@link OutputState}s.
+ * the output part consists of {@link OutputState}s. Nulls represent empty cubes.
+ * Nulls can happen in this class only to make sure the {@link Cover} class doesn't
+ * contain empty ({@link Cube#isEmpty(Cube)}) cubes.
  */
 public class Cube {
   public InputState[] input;
   public OutputState[] output;
 
-  /**
-   * Reference copy constructor.
-   *
-   * @param input  array of {@link InputState}s.
-   * @param output array of {@link OutputState}s.
-   */
   public Cube(InputState[] input, OutputState[] output) {
     this.input = input;
     this.output = output;
@@ -32,8 +28,19 @@ public class Cube {
    * @param cube {@link Cube}.
    */
   public Cube(Cube cube) {
+    input = new InputState[cube.input.length];
+    output = new OutputState[cube.output.length];
     System.arraycopy(cube.input, 0, input, 0, cube.input.length);
     System.arraycopy(cube.output, 0, output, 0, cube.output.length);
+  }
+
+  /**
+   * Convenience copy method.
+   *
+   * @return copy of this object.
+   */
+  public Cube copy() {
+    return new Cube(this);
   }
 
   @Override
@@ -156,8 +163,7 @@ public class Cube {
   /**
    * Method returns a new cube that represents an intersection
    * between this cube and another cube (given parameter).<br/>
-   * Note: This operation can produce an {@link InputState#EMPTY} cube.
-   * In case an empty cube is noticed this method will return null.
+   * Note: In case an empty cube is noticed this method will return null.
    *
    * @param other {@link Cube}.
    * @return {@link Cube}.
@@ -167,25 +173,59 @@ public class Cube {
   }
 
   /**
-   * Complements the input part of the cube.
-   * This is an in place transformation.
+   * Method returns a cube representing the cofactor of this
+   * cube with respect to the given cube.<br/>
+   * Note: If this cube and the given cube have not intersection
+   * then the cofactor is an empty cube. The method will return null.<br/>
+   * Warning: a.cofactor(b) and b.cofactor(a) won't yield same results!
    *
-   * @see InputState#complement()
+   * @param other {@link Cube}.
+   * @return {@link Cube}.
    */
-  public void inputComplement() {
-    for (int i = 0; i < input.length; i++)
-      input[i] = input[i].complement();
+  public Cube cofactor(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    if (and(other) == null) return null;
+    Cube retValue = new Cube(this);
+
+    for (int i = 0; i < retValue.input.length; i++)
+      if (other.input[i] == ZERO || other.input[i] == ONE)
+        retValue.input[i] = DONTCARE;
+
+    for (int i = 0; i < retValue.output.length; i++)
+      if (other.output[i] == NOT_OUTPUT)
+        retValue.output[i] = OUTPUT;
+
+    return retValue;
   }
 
   /**
    * Complements the output part of the cube.
    * This is an in place transformation.
    *
+   * @return this object for convenience.
    * @see OutputState#complement()
    */
-  public void outputComplement() {
+  public Cube outputComplement() {
     for (int i = 0; i < output.length; i++)
       output[i] = output[i].complement();
+
+    return this;
+  }
+
+  /**
+   * Complements only the input part of the cube. The
+   * method represents classic implicant complement.
+   *
+   * @return this object, for convenience.
+   * @see InputState#complement()
+   */
+  public Cube complement() {
+    for (int i = 0; i < input.length; i++)
+      input[i] = input[i].complement();
+
+    return this;
   }
 
   /**
@@ -196,6 +236,9 @@ public class Cube {
    * @return primitive int.
    */
   public int inputDistance(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
     int retValue = 0;
 
     for (int i = 0; i < input.length; i++)
@@ -213,6 +256,9 @@ public class Cube {
    * @return primitive int.
    */
   public int outputDistance(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
     int retValue = 0;
 
     for (int i = 0; i < output.length; i++)
