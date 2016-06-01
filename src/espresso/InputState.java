@@ -42,8 +42,9 @@ public enum InputState {
    * @return {@link InputState}.
    */
   public InputState complement() {
-    if (this == EMPTY) return DONTCARE;
-    if (this == DONTCARE) return EMPTY;
+    if (this == EMPTY)
+      throw new UnsupportedOperationException("Complement of an empty cube doesn't exist.");
+    if (this == DONTCARE) return DONTCARE;
 
     return this == ONE ? ZERO : ONE;
   }
