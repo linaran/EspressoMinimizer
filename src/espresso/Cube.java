@@ -26,14 +26,132 @@ public class Cube {
     this.output = output;
   }
 
+  /**
+   * Copy constructor.
+   *
+   * @param cube {@link Cube}.
+   */
+  public Cube(Cube cube) {
+    System.arraycopy(cube.input, 0, input, 0, cube.input.length);
+    System.arraycopy(cube.output, 0, output, 0, cube.output.length);
+  }
+
   @Override
   public String toString() {
     return Arrays.toString(input) + " " + Arrays.toString(output);
   }
 
+  /**
+   * {@link Arrays#equals(Object)} doesn't work properly so this is a reimplementation
+   * of the method.
+   *
+   * @param o1 array of {@link InputState}s.
+   * @param o2 array of {@link InputState}s.
+   * @return true if arrays are equal.
+   * @see Arrays#equals(Object)
+   */
+  private boolean inputStateArrayEquals(InputState[] o1, InputState[] o2) {
+    if (o1 == o2)
+      return true;
+    if (o1 == null || o2 == null)
+      return false;
+
+    int length = o1.length;
+    if (o2.length != length)
+      return false;
+
+    for (int i = 0; i < length; i++) {
+      InputState state1 = o1[i];
+      InputState state2 = o2[i];
+      if (!(state1 == null ? state2 == null : state1 == state2))
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * {@link Arrays#equals(Object)} doesn't work properly so this is a reimplementation
+   * of the method.
+   *
+   * @param o1 array of {@link OutputState}s.
+   * @param o2 array of {@link OutputState}s.
+   * @return true if arrays are equal.
+   * @see Arrays#equals(Object)
+   */
+  private boolean outputStateArrayEquals(OutputState[] o1, OutputState[] o2) {
+    if (o1 == o2)
+      return true;
+    if (o1 == null || o2 == null)
+      return false;
+
+    int length = o1.length;
+    if (o2.length != length)
+      return false;
+
+    for (int i = 0; i < length; i++) {
+      OutputState state1 = o1[i];
+      OutputState state2 = o2[i];
+      if (!(state1 == null ? state2 == null : state1 == state2))
+        return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Cube cube = (Cube) o;
+
+    return inputStateArrayEquals(input, cube.input) && outputStateArrayEquals(output, cube.output);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = Arrays.hashCode(input);
+    result = 31 * result + Arrays.hashCode(output);
+    return result;
+  }
+
 //////////////////////////////////////////////////////////////////////////////
 //  Cube operations
 //////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Method returns a new cube that represents an intersection
+   * between this cube and another cube (given parameter).<br/>
+   * Note: This operation can produce an {@link InputState#EMPTY} cube.
+   * In case an empty cube is noticed this method will return null if
+   * parameter returnEmpty is false. Otherwise an empty Cube will be returned.
+   *
+   * @param other       {@link Cube}.
+   * @param returnEmpty primitive boolean, if false empty cubes will be returned as null.
+   * @return {@link Cube}.
+   */
+  public Cube and(Cube other, boolean returnEmpty) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    InputState[] inputStates = new InputState[input.length];
+    OutputState[] outputStates = new OutputState[output.length];
+
+    for (int i = 0; i < inputStates.length; i++) {
+      inputStates[i] = InputState.and(input[i], other.input[i]);
+      if (inputStates[i] == EMPTY && !returnEmpty) return null;
+    }
+
+    boolean isEmpty = true;
+    for (int i = 0; i < outputStates.length; i++) {
+      outputStates[i] = OutputState.and(output[i], other.output[i]);
+      if (outputStates[i] != NOT_OUTPUT && isEmpty) isEmpty = false;
+    }
+
+    if (isEmpty && !returnEmpty) return null;
+    else return new Cube(inputStates, outputStates);
+  }
 
   /**
    * Method returns a new cube that represents an intersection
@@ -45,25 +163,29 @@ public class Cube {
    * @return {@link Cube}.
    */
   public Cube and(Cube other) {
-    if (input.length != other.input.length || output.length != other.output.length)
-      throw new IllegalArgumentException("Cube lengths are not compatible.");
+    return and(other, false);
+  }
 
-    InputState[] inputStates = new InputState[input.length];
-    OutputState[] outputStates = new OutputState[output.length];
+  /**
+   * Complements the input part of the cube.
+   * This is an in place transformation.
+   *
+   * @see InputState#complement()
+   */
+  public void inputComplement() {
+    for (int i = 0; i < input.length; i++)
+      input[i] = input[i].complement();
+  }
 
-    for (int i = 0; i < inputStates.length; i++) {
-      inputStates[i] = InputState.and(input[i], other.input[i]);
-      if (inputStates[i] == EMPTY) return null;
-    }
-
-    boolean isEmpty = true;
-    for (int i = 0; i < outputStates.length; i++) {
-      outputStates[i] = OutputState.and(output[i], other.output[i]);
-      if (outputStates[i] != NOT_OUTPUT && isEmpty) isEmpty = false;
-    }
-
-    if (isEmpty) return null;
-    else return new Cube(inputStates, outputStates);
+  /**
+   * Complements the output part of the cube.
+   * This is an in place transformation.
+   *
+   * @see OutputState#complement()
+   */
+  public void outputComplement() {
+    for (int i = 0; i < output.length; i++)
+      output[i] = output[i].complement();
   }
 
   /**
@@ -101,20 +223,6 @@ public class Cube {
   }
 
   /**
-   * Method returns the number of {@link InputState#EMPTY} and {@link OutputState#NOT_OUTPUT}
-   * in the intersection of this cube and another cube (given parameter).
-   *
-   * @param other {@link Cube}.
-   * @return primitive int.
-   */
-  public int distance(Cube other) {
-    if (input.length != other.input.length || output.length != other.output.length)
-      throw new IllegalArgumentException("Cube lengths are not compatible.");
-
-    return inputDistance(other) + outputDistance(other);
-  }
-
-  /**
    * Consensus between cube <b>a</b> and cube <b>b</b> returns a
    * cube that has one "leg" in <b>a</b> and another in <b>b</b>.<br/>
    * It's sort of a bridge between <b>a</b> and <b>b</b>.<br/>
@@ -139,7 +247,7 @@ public class Cube {
     else if (distance >= 2)
       return null;
 
-    Cube retValue = and(other);
+    Cube retValue = and(other, true);
 
     if (inputDistance == 1 && outputDistance == 0) {
       for (int i = 0; i < retValue.input.length; i++)
@@ -155,7 +263,7 @@ public class Cube {
       return retValue;
     }
 
-    throw new UnsupportedOperationException("Likely a bug in Cube#distance, inputDistance, outputDistance.");
+    throw new UnsupportedOperationException("Likely a bug in Cube#inputDistance, outputDistance.");
   }
 
 //  TODO: contain, strictContain, notContain if needed.
