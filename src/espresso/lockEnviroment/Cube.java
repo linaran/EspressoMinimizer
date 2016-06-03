@@ -1,4 +1,8 @@
-package espresso;
+package espresso.lockEnviroment;
+
+import espresso.Containment;
+import espresso.InputState;
+import espresso.OutputState;
 
 import java.util.Arrays;
 
@@ -14,8 +18,9 @@ import static espresso.OutputState.*;
  * contain empty ({@link Cube#isEmpty(Cube)}) cubes.
  */
 public class Cube {
-  public InputState[] input;
-  public OutputState[] output;
+  boolean lockInputStates = false;
+  private InputState[] input;
+  private OutputState[] output;
 
   /**
    * See {@link #Cube(int, int)}.
@@ -172,6 +177,35 @@ public class Cube {
     int result = Arrays.hashCode(input);
     result = 31 * result + Arrays.hashCode(output);
     return result;
+  }
+
+  public InputState input(int i) {
+    return input[i];
+  }
+
+  public OutputState output(int i) {
+    return output[i];
+  }
+
+  public void setInput(InputState inputState, int i) {
+    if (lockInputStates)
+      throw new UnsupportedOperationException(
+          "This cube is currently locked and input states are immutable. " +
+              "To unlock it, extract/remove it from its cover"
+      );
+    input[i] = inputState;
+  }
+
+  public void setOutput(OutputState outputState, int i) {
+    output[i] = outputState;
+  }
+
+  public int inputLength() {
+    return input.length;
+  }
+
+  public int outputLength() {
+    return output.length;
   }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 package espresso;
 
+import espresso.lockEnviroment.Cube;
+
 import static espresso.Containment.*;
 
 /**

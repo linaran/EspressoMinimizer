@@ -1,0 +1,1 @@
+Classes Cover, CubeSet and Cube MUST be in a same package (and preferably alone).

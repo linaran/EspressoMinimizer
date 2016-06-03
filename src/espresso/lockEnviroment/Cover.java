@@ -1,4 +1,6 @@
-package espresso;
+package espresso.lockEnviroment;
+
+import espresso.InputState;
 
 import static espresso.InputState.*;
 
@@ -18,12 +20,12 @@ public class Cover {
   public Cover(Cube... cubes) {
     if (cubes == null) throw new NullPointerException("Parameter can't be null.");
 
-    int inputLength = cubes[0].input.length;
-    int outputLength = cubes[0].output.length;
+    int inputLength = cubes[0].inputLength();
+    int outputLength = cubes[0].outputLength();
     this.cubes = new CubeSet();
 
     for (Cube cube : cubes) {
-      if (inputLength != cube.input.length || outputLength != cube.output.length)
+      if (inputLength != cube.inputLength() || outputLength != cube.outputLength())
         throw new IllegalArgumentException("All cubes must have same input and output length.");
 
       this.cubes.add(cube);
@@ -53,6 +55,41 @@ public class Cover {
     return retValue;
   }
 
+  /**
+   * {@link Cube}s contained in a {@link Cover} are locked.
+   * The only way to change an {@link InputState} of a locked
+   * {@link Cube} is to use this method.<br/>
+   * Inside {@link Cover} there are fields that depend on {@link Cube}
+   * input states and it is important these fields don't change from the
+   * outside (accidentally or deliberately).
+   *
+   * @param cube {@link Cube} to be modified.
+   * @param i    primitive int, input index.
+   */
+  public void changeCubeInputState(Cube cube, InputState inputState, int i){
+    InputState oldState = cube.input(i);
+    if (oldState == ONE && oldState != inputState) {
+      if (inputState == ZERO) cubes.zeroColumnCount[i]++;
+      cubes.oneColumnCount[i]--;
+    }
+    if (oldState == ZERO && oldState != inputState) {
+      if (inputState == ONE) cubes.oneColumnCount[i]++;
+      cubes.zeroColumnCount[i]--;
+    }
+
+    cube.lockInputStates = false;
+    cube.setInput(inputState, i);
+    cube.lockInputStates = true;
+  }
+
+  public int getOneCount(int column) {
+    return cubes.oneColumnCount[column];
+  }
+
+  public int getZeroCount(int column) {
+    return cubes.zeroColumnCount[column];
+  }
+
 //////////////////////////////////////////////////////////////////////////////
 //  Unate recursive paradigm
 //////////////////////////////////////////////////////////////////////////////
@@ -67,7 +104,7 @@ public class Cover {
    * @return primitive int, index of the chosen variable in the cubes of the cover.
    */
   private int binateSelect() {
-    int variableCount = cubes.iterator().next().input.length;
+    int variableCount = cubes.iterator().next().inputLength();
     int maxSum = -1;
     int maxIndex = -2;
 
@@ -128,7 +165,7 @@ public class Cover {
    * @return primitive int 1 is positive unate, -1 is negative unate, 0 isn't unate.
    */
   public int unateStatus() {
-    int variableCount = cubes.iterator().next().input.length;
+    int variableCount = cubes.iterator().next().inputLength();
     boolean increasing = true;
     boolean decreasing = true;
 
