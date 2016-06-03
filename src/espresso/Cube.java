@@ -17,9 +17,60 @@ public class Cube {
   public InputState[] input;
   public OutputState[] output;
 
+  /**
+   * See {@link #Cube(int, int)}.
+   *
+   * @param inputCount  primitive int.
+   * @param outputCount primitive int.
+   */
+  private void totalUniverseInit(int inputCount, int outputCount) {
+    input = new InputState[inputCount];
+    output = new OutputState[outputCount];
+
+    for (int i = 0; i < inputCount; i++) input[i] = DONTCARE;
+    for (int i = 0; i < outputCount; i++) output[i] = OUTPUT;
+  }
+
+  /**
+   * Creates a cube with the given number of input variables
+   * and the given number of output variables. Cube is initialized
+   * to be a total universal cube (all inputs are in {@link InputState#DONTCARE}
+   * state and all outputs are in {@link OutputState#OUTPUT}).
+   *
+   * @param inputCount  primitive int.
+   * @param outputCount primitive int.
+   */
+  public Cube(int inputCount, int outputCount) {
+    totalUniverseInit(inputCount, outputCount);
+  }
+
+//  /**
+//   * Convenient way to create a cube representation of a single
+//   * input variable.
+//   *
+//   * @param inputCount  primitive int.
+//   * @param outputCount primitive int.
+//   * @param index       primitive int.
+//   */
+//  public Cube(int inputCount, int outputCount, int index) {
+//    totalUniverseInit(inputCount, outputCount);
+//    input[index] = ONE;
+//  }
+
+  /**
+   * Creates a new cube with the given array of input and output states.
+   * Note: given parameters are value-copied so there are no implicit
+   * reference chains.
+   *
+   * @param input  array of {@link InputState}s.
+   * @param output array of {@link OutputState}s.
+   */
   public Cube(InputState[] input, OutputState[] output) {
-    this.input = input;
-    this.output = output;
+    this.input = new InputState[input.length];
+    this.output = new OutputState[output.length];
+
+    System.arraycopy(input, 0, this.input, 0, input.length);
+    System.arraycopy(output, 0, this.output, 0, output.length);
   }
 
   /**
