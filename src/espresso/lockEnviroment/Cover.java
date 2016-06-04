@@ -2,6 +2,8 @@ package espresso.lockEnviroment;
 
 import espresso.InputState;
 
+import java.util.Iterator;
+
 import static espresso.InputState.*;
 
 /**
@@ -10,7 +12,7 @@ import static espresso.InputState.*;
  * of a boolean function.
  * TODO: unate recursive paradigm.
  */
-public class Cover {
+public class Cover implements Iterable<Cube>{
   public CubeSet cubes;
 
   public Cover() {
@@ -46,6 +48,11 @@ public class Cover {
   }
 
   @Override
+  public Iterator<Cube> iterator() {
+    return cubes.iterator();
+  }
+
+  @Override
   public String toString() {
     String retValue = "";
     for (Cube cube : cubes) {
@@ -53,6 +60,18 @@ public class Cover {
     }
     if (retValue.equals("")) return "empty\n";
     return retValue;
+  }
+
+  public int size() {
+    return cubes.size();
+  }
+
+  public int inputCount() {
+    return cubes.iterator().next().inputLength();
+  }
+
+  public int outputCount() {
+    return cubes.iterator().next().outputLength();
   }
 
   /**
@@ -91,8 +110,42 @@ public class Cover {
   }
 
 //////////////////////////////////////////////////////////////////////////////
-//  Unate recursive paradigm
+//  Espresso operations
 //////////////////////////////////////////////////////////////////////////////
+
+  public void unateComplement() {
+    if (!isUnate())
+      throw new UnsupportedOperationException("Can't perform unate complement on non unate covers.");
+//    TODO:
+  }
+
+  /**
+   * A cover can be increasing or decreasing monotone in a variable
+   * or it doesn't have to be monotone at all (in a variable). This method returns 1 if
+   * the cover is monotone increasing, -1 if it is monotone decreasing
+   * and 0 if it's not monotone at all.<br/>
+   * In short this function checks if a cover is monotone in the given variable.<br/>
+   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
+   *
+   * @param index primitive int, index where the variable is located.
+   * @return 1 (monotone increasing), -1 (monotone decreasing), 0 (not monotone).
+   */
+  public int unateStatus(int index) {
+    if (cubes.getOneCount(index) == 0) return -1;
+    else if (cubes.getZeroCount(index) == 0) return 1;
+    else return 0;
+  }
+
+  public boolean isUnate() {
+    int variableCount = cubes.iterator().next().inputLength();
+
+    for (int i = 0; i < variableCount; i++) {
+      if (unateStatus(i) == 0)
+        return false;
+    }
+
+    return true;
+  }
 
   /**
    * Method chooses the most binate input variable in this cover.
@@ -154,51 +207,34 @@ public class Cover {
 //    TODO: Containment procedure implementation.
   }
 
-  /**
-   * Method tells how monotone this cover is. Cover can be increasing
-   * monotone, decreasing monotone or not monotone at all. A cover is
-   * increasing/decreasing monotone if it is increasing/decreasing
-   * monotone in all of it's input variables. For a full explanation
-   * see {@link Cover#unateStatus(int)}. <br/>
-   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
-   *
-   * @return primitive int 1 is positive unate, -1 is negative unate, 0 isn't unate.
-   */
-  public int unateStatus() {
-    int variableCount = cubes.iterator().next().inputLength();
-    boolean increasing = true;
-    boolean decreasing = true;
-
-    for (int i = 0; i < variableCount; i++) {
-      if (unateStatus(i) == 1) decreasing = false;
-      if (unateStatus(i) == -1) increasing = false;
-      if (!decreasing && !increasing) return 0;
-    }
-
-    if (increasing) return 1;
-    return -1;
-  }
-
-  /**
-   * A cover can be increasing or decreasing monotone in a variable
-   * or it doesn't have to be monotone at all (in a variable). This method returns 1 if
-   * the cover is monotone increasing, -1 if it is monotone decreasing
-   * and 0 if it's not monotone at all.<br/>
-   * In short this function checks if a cover is monotone in the given variable.<br/>
-   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
-   *
-   * @param index primitive int, index where the variable is located.
-   * @return 1 (monotone increasing), -1 (monotone decreasing), 0 (not monotone).
-   */
-  public int unateStatus(int index) {
-    if (cubes.getOneCount(index) == 0) return -1;
-    else if (cubes.getZeroCount(index) == 0) return 1;
-    else return 0;
-  }
-
 //////////////////////////////////////////////////////////////////////////////
 //  Cover operations
 //////////////////////////////////////////////////////////////////////////////
+
+//  /**
+//   * Method tells how monotone this cover is. Cover can be increasing
+//   * monotone, decreasing monotone or not monotone at all. A cover is
+//   * increasing/decreasing monotone if it is increasing/decreasing
+//   * monotone in all of it's input variables. For a full explanation
+//   * see {@link Cover#unateStatus(int)}. <br/>
+//   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
+//   *
+//   * @return primitive int 1 is positive unate, -1 is negative unate, 0 isn't unate.
+//   */
+//  public int unateStatus() {
+//    int variableCount = cubes.iterator().next().inputLength();
+//    boolean increasing = true;
+//    boolean decreasing = true;
+//
+//    for (int i = 0; i < variableCount; i++) {
+//      if (unateStatus(i) == 1) decreasing = false;
+//      if (unateStatus(i) == -1) increasing = false;
+//      if (!decreasing && !increasing) return 0;
+//    }
+//
+//    if (increasing) return 1;
+//    return -1;
+//  }
 
   /**
    * Method returns the Shannon expansion of this cover with
