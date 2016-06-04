@@ -13,7 +13,6 @@ public class UnateOperations {
   private static int inputCount = 0;
   private static int outputCount = 0;
   private static int splitIndex = 0;
-  private static int columnCount[][];
 
   public UnateOperations() {
     throw new UnsupportedOperationException("nope..");
@@ -25,14 +24,13 @@ public class UnateOperations {
 
     inputCount = cover.inputCount();
     outputCount = cover.outputCount();
-    columnCount = cover.getCurrentColumnCount();
 
     return recursiveUnateComplement(cover);
   }
 
   private static Cover recursiveUnateComplement(Cover cover) {
-    System.out.println("Current cover:");
-    System.out.println(cover);
+//    System.out.println("Current cover:");
+//    System.out.println(cover);
     Cover retValue = specialCase(cover);
 
     if (retValue != null) {
@@ -42,29 +40,26 @@ public class UnateOperations {
     Cube splittingCube = splittingVariable(cover);
     Cover[] cofactors = cover.shannonCofactors(splittingCube);
 
-    System.out.println("Splitting cubes:");
-    System.out.println(splittingCube.copy().complement());
-    System.out.println(splittingCube);
-    System.out.println("\nCofactors:");
-    System.out.println(cofactors[0]);
-    System.out.println(cofactors[1]);
-    System.out.println("--------------------------------------------------");
+//    System.out.println("Splitting cubes:");
+//    System.out.println(splittingCube.copy().complement());
+//    System.out.println(splittingCube);
+//    System.out.println("\nCofactors:");
+//    System.out.println(cofactors[0]);
+//    System.out.println(cofactors[1]);
+//    System.out.println("--------------------------------------------------");
 
     Cover left;
     Cover right;
 
-    if (columnCount[0][splitIndex - 1] == 0) {
+    if (cover.getZeroColumnCount(splitIndex - 1) == 0) {
       left = recursiveUnateComplement(cofactors[1]);
       right = Cover.of(splittingCube.copy().complement()).intersect(recursiveUnateComplement(cofactors[0]));
-    } else if (columnCount[1][splitIndex - 1] == 0){
+    } else if (cover.getOneColumnCount(splitIndex - 1) == 0){
       left = Cover.of(splittingCube).intersect(recursiveUnateComplement(cofactors[1]));
       right = recursiveUnateComplement(cofactors[0]);
     } else {
-      throw new UnsupportedOperationException("Hell");
+      throw new UnsupportedOperationException("Crap");
     }
-
-//    Cover left = Cover.of(splittingCube.copy().complement()).intersect(recursiveUnateComplement(cofactors[0]));
-//    Cover right = Cover.of(splittingCube).intersect(recursiveUnateComplement(cofactors[1]));
 
     return left.union(right);
   }

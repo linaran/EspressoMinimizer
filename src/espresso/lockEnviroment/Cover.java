@@ -1,11 +1,7 @@
 package espresso.lockEnviroment;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-
-import static espresso.InputState.ONE;
-import static espresso.InputState.ZERO;
 
 /**
  * By definition cover is a set of cubes.
@@ -14,7 +10,6 @@ import static espresso.InputState.ZERO;
  * TODO: unate recursive paradigm.
  */
 public class Cover implements Iterable<Cube> {
-  private int[][] columnCount;
   private CubeSet cubes;
 
   public Cover() {
@@ -60,7 +55,6 @@ public class Cover implements Iterable<Cube> {
   }
 
   public boolean add(Cube cube) {
-    if (columnCount == null) columnCount = new int[2][cubes.getInputLength()];
     return cubes.add(cube);
   }
 
@@ -105,32 +99,12 @@ public class Cover implements Iterable<Cube> {
 //  Espresso operations
 //////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * Renew the columnCount field.
-   */
-  private void columnCount() {
-    if (columnCount == null)
-      columnCount = new int[2][cubes.getInputLength()];
-
-    for (Cube cube : this) {
-      for (int i = 0; i < cubes.getInputLength(); i++) {
-        if (cube.input(i) == ZERO)
-          columnCount[0][i]++;
-        if (cube.input(i) == ONE)
-          columnCount[1][i]++;
-      }
-    }
+  public int getOneColumnCount(int i) {
+    return cubes.getOneColumnCount(i);
   }
 
-  /**
-   * Method calculates and returns the current count
-   * of ones and zeroes column-wise in the cover.
-   *
-   * @return int[][]
-   */
-  public int[][] getCurrentColumnCount() {
-    columnCount();
-    return columnCount == null ? new int[][]{{0}, {0}} : columnCount;
+  public int getZeroColumnCount(int i) {
+    return cubes.getZeroColumnCount(i);
   }
 
   /**
@@ -142,10 +116,8 @@ public class Cover implements Iterable<Cube> {
     if (cubes.size() == 0)
       throw new UnsupportedOperationException("Cube is empty!");
 
-    columnCount();
-
     for (int i = 0; i < cubes.getInputLength(); i++)
-      if (columnCount[0][i] != 0 && columnCount[1][i] != 0)
+      if (getZeroColumnCount(i) != 0 && getOneColumnCount(i) != 0)
         return false;
 
     return true;
@@ -172,9 +144,9 @@ public class Cover implements Iterable<Cube> {
       return -1;
 
     for (int i = 0; i < variableCount; i++)
-      if (columnCount[1][i] + columnCount[0][i] > maxSum) {
+      if (getOneColumnCount(i) + getZeroColumnCount(i) > maxSum) {
         maxIndex = i;
-        maxSum = columnCount[1][i] + columnCount[0][i];
+        maxSum = getOneColumnCount(i) + getZeroColumnCount(i);
       }
 
     return maxIndex;
