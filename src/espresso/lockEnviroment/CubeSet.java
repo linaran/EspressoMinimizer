@@ -5,8 +5,6 @@ import espresso.InputState;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static espresso.InputState.*;
-
 /**
  * Class was created to enforce a condition that all {@link Cube}s in a {@link Cover}
  * must have the same number of inputs and outputs. Also the class keeps track of the
@@ -14,9 +12,9 @@ import static espresso.InputState.*;
  * the whole set. That way there is no need to iterate over all of the cubes in order
  * to check certain properties of a cover.
  */
-class CubeSet extends HashSet<Cube> {
-  int[] oneColumnCount; // package-local is not a mistake
-  int[] zeroColumnCount;
+public class CubeSet extends HashSet<Cube> {
+  private int inputLength = 0;
+  private int outputLength = 0;
 
   public CubeSet() {
   }
@@ -33,58 +31,26 @@ class CubeSet extends HashSet<Cube> {
     super(initialCapacity);
   }
 
-  public int getOneCount(int columnIndex) {
-    return oneColumnCount[columnIndex];
+  public int getInputLength() {
+    return inputLength;
   }
 
-  public int getZeroCount(int columnIndex) {
-    return zeroColumnCount[columnIndex];
-  }
-
-  public int columnLength() {
-    if (oneColumnCount == null) return 0;
-    else return oneColumnCount.length;
+  public int getOutputLength() {
+    return outputLength;
   }
 
   @Override
   public boolean add(Cube cube) {
-    if (iterator().hasNext()) {
-      Cube fromSet = iterator().next();
-      if (fromSet.inputLength() != cube.inputLength() || fromSet.outputLength() != cube.outputLength())
+    if (inputLength != 0 && outputLength != 0) {
+      if (inputLength != cube.inputLength() || outputLength != cube.outputLength())
         throw new IllegalArgumentException(
             "Given cube must have the same number of inputs and outputs as the cubes in the set."
         );
     } else {
-      if (oneColumnCount == null) oneColumnCount = new int[cube.inputLength()];
-      if (zeroColumnCount == null) zeroColumnCount = new int[cube.inputLength()];
+      inputLength = cube.inputLength();
+      outputLength = cube.outputLength();
     }
 
-    for (int i = 0; i < cube.inputLength(); i++) {
-      if (cube.input(i) == ONE) oneColumnCount[i]++;
-      if (cube.input(i) == ZERO) zeroColumnCount[i]++;
-    }
-
-    cube.lockInputStates = true;
     return super.add(cube);
-  }
-
-  @Override
-  public boolean remove(Object o) {
-    if (!super.remove(o))
-      return false;
-
-    Cube cube = (Cube) o;
-    for (int i = 0; i < cube.inputLength(); i++) {
-      if (cube.input(i) == ONE) oneColumnCount[i]--;
-      if (cube.input(i) == ZERO) zeroColumnCount[i]--;
-    }
-
-    if (!iterator().hasNext()) {
-      oneColumnCount = null;
-      zeroColumnCount = null;
-    }
-
-    cube.lockInputStates = false;
-    return super.remove(o);
   }
 }

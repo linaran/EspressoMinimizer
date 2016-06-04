@@ -18,9 +18,9 @@ import static espresso.OutputState.*;
  * contain empty ({@link Cube#isEmpty(Cube)}) cubes.
  */
 public class Cube {
-  boolean lockInputStates = false;
   private InputState[] input;
   private OutputState[] output;
+  private int[][] columnCount;
 
   /**
    * See {@link #Cube(int, int)}.
@@ -32,7 +32,7 @@ public class Cube {
     input = new InputState[inputCount];
     output = new OutputState[outputCount];
 
-    for (int i = 0; i < inputCount; i++) input[i] = DONTCARE;
+    for (int i = 0; i < inputCount; i++) setInput(DONTCARE, i);
     for (int i = 0; i < outputCount; i++) output[i] = OUTPUT;
   }
 
@@ -188,12 +188,16 @@ public class Cube {
   }
 
   public void setInput(InputState inputState, int i) {
-    if (lockInputStates)
-      throw new UnsupportedOperationException(
-          "This cube is currently locked and input states are immutable. " +
-              "To unlock it, extract/remove it from its cover"
-      );
-    input[i] = inputState;
+    if (columnCount != null) {
+      int newState = inputState.valueOf();
+
+      if (input[i] != null && input[i].valueOf() < 2)
+        columnCount[input[i].valueOf()][i]--;
+      if (newState < 2)
+        columnCount[newState][i]++;
+    }
+
+    input[i] = inputState; // okay
   }
 
   public void setOutput(OutputState outputState, int i) {
@@ -208,7 +212,16 @@ public class Cube {
     return output.length;
   }
 
-//////////////////////////////////////////////////////////////////////////////
+  /**
+   * This is a method and a field with close correlation to {@link Cover}.
+   *
+   * @param columnCount primitive int[][]
+   */
+  public void setColumnCount(int[][] columnCount) {
+    this.columnCount = columnCount;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
 //  Cube operations
 //////////////////////////////////////////////////////////////////////////////
 
@@ -276,7 +289,7 @@ public class Cube {
 
     for (int i = 0; i < retValue.input.length; i++)
       if (other.input[i] == ZERO || other.input[i] == ONE)
-        retValue.input[i] = DONTCARE;
+        retValue.setInput(DONTCARE, i);
 
     for (int i = 0; i < retValue.output.length; i++)
       if (other.output[i] == NOT_OUTPUT)
@@ -308,7 +321,7 @@ public class Cube {
    */
   public Cube complement() {
     for (int i = 0; i < input.length; i++)
-      input[i] = input[i].complement();
+      setInput(input[i].complement(), i);
 
     return this;
   }
@@ -383,7 +396,7 @@ public class Cube {
     if (inputDistance == 1 && outputDistance == 0) {
       for (int i = 0; i < retValue.input.length; i++)
         if (retValue.input[i] == EMPTY)
-          retValue.input[i] = DONTCARE;
+          retValue.setInput(DONTCARE, i);
       return retValue;
     }
 

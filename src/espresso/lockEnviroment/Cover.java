@@ -1,10 +1,11 @@
 package espresso.lockEnviroment;
 
-import espresso.InputState;
-
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
-import static espresso.InputState.*;
+import static espresso.InputState.ONE;
+import static espresso.InputState.ZERO;
 
 /**
  * By definition cover is a set of cubes.
@@ -12,8 +13,9 @@ import static espresso.InputState.*;
  * of a boolean function.
  * TODO: unate recursive paradigm.
  */
-public class Cover implements Iterable<Cube>{
-  public CubeSet cubes;
+public class Cover implements Iterable<Cube> {
+  private int[][] columnCount;
+  private CubeSet cubes;
 
   public Cover() {
     cubes = new CubeSet();
@@ -26,12 +28,7 @@ public class Cover implements Iterable<Cube>{
     int outputLength = cubes[0].outputLength();
     this.cubes = new CubeSet();
 
-    for (Cube cube : cubes) {
-      if (inputLength != cube.inputLength() || outputLength != cube.outputLength())
-        throw new IllegalArgumentException("All cubes must have same input and output length.");
-
-      this.cubes.add(cube);
-    }
+    Collections.addAll(this.cubes, cubes);
   }
 
   /**
@@ -62,87 +59,94 @@ public class Cover implements Iterable<Cube>{
     return retValue;
   }
 
+  public boolean add(Cube cube) {
+    if (columnCount == null) columnCount = new int[2][cubes.getInputLength()];
+    return cubes.add(cube);
+  }
+
+  public boolean remove(Cube cube) {
+    return cubes.remove(cube);
+  }
+
+  /**
+   * Number of cubes in the cover.
+   *
+   * @return primitive int.
+   */
   public int size() {
     return cubes.size();
   }
 
+  /**
+   * Allowed input count for the cubes in the cover.
+   * If the method returns 0 then the cover is waiting
+   * for the first cube to be added to the set. After
+   * the first cube is added, allowed counts are fixed.
+   *
+   * @return primitive int.
+   */
   public int inputCount() {
-    return cubes.iterator().next().inputLength();
-  }
-
-  public int outputCount() {
-    return cubes.iterator().next().outputLength();
+    return cubes.getInputLength();
   }
 
   /**
-   * {@link Cube}s contained in a {@link Cover} are locked.
-   * The only way to change an {@link InputState} of a locked
-   * {@link Cube} is to use this method.<br/>
-   * Inside {@link Cover} there are fields that depend on {@link Cube}
-   * input states and it is important these fields don't change from the
-   * outside (accidentally or deliberately).
+   * Allowed output count for the cubes in the cover.
+   * If the method returns 0 then the cover is waiting
+   * for the first cube to be added to the set. After
+   * the first cube is added, allowed counts are fixed.
    *
-   * @param cube {@link Cube} to be modified.
-   * @param i    primitive int, input index.
+   * @return primitive int.
    */
-  public void changeCubeInputState(Cube cube, InputState inputState, int i){
-    InputState oldState = cube.input(i);
-    if (oldState == ONE && oldState != inputState) {
-      if (inputState == ZERO) cubes.zeroColumnCount[i]++;
-      cubes.oneColumnCount[i]--;
-    }
-    if (oldState == ZERO && oldState != inputState) {
-      if (inputState == ONE) cubes.oneColumnCount[i]++;
-      cubes.zeroColumnCount[i]--;
-    }
-
-    cube.lockInputStates = false;
-    cube.setInput(inputState, i);
-    cube.lockInputStates = true;
-  }
-
-  public int getOneCount(int column) {
-    return cubes.oneColumnCount[column];
-  }
-
-  public int getZeroCount(int column) {
-    return cubes.zeroColumnCount[column];
+  public int outputCount() {
+    return cubes.getOutputLength();
   }
 
 //////////////////////////////////////////////////////////////////////////////
 //  Espresso operations
 //////////////////////////////////////////////////////////////////////////////
 
-  public void unateComplement() {
-    if (!isUnate())
-      throw new UnsupportedOperationException("Can't perform unate complement on non unate covers.");
-//    TODO:
+  /**
+   * Renew the columnCount field.
+   */
+  private void columnCount() {
+    if (columnCount == null)
+      columnCount = new int[2][cubes.getInputLength()];
+
+    for (Cube cube : this) {
+      for (int i = 0; i < cubes.getInputLength(); i++) {
+        if (cube.input(i) == ZERO)
+          columnCount[0][i]++;
+        if (cube.input(i) == ONE)
+          columnCount[1][i]++;
+      }
+    }
   }
 
   /**
-   * A cover can be increasing or decreasing monotone in a variable
-   * or it doesn't have to be monotone at all (in a variable). This method returns 1 if
-   * the cover is monotone increasing, -1 if it is monotone decreasing
-   * and 0 if it's not monotone at all.<br/>
-   * In short this function checks if a cover is monotone in the given variable.<br/>
-   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
+   * Method calculates and returns the current count
+   * of ones and zeroes column-wise in the cover.
    *
-   * @param index primitive int, index where the variable is located.
-   * @return 1 (monotone increasing), -1 (monotone decreasing), 0 (not monotone).
+   * @return int[][]
    */
-  public int unateStatus(int index) {
-    if (cubes.getOneCount(index) == 0) return -1;
-    else if (cubes.getZeroCount(index) == 0) return 1;
-    else return 0;
+  public int[][] getCurrentColumnCount() {
+    columnCount();
+    return columnCount == null ? new int[][]{{0}, {0}} : columnCount;
   }
 
+  /**
+   * This method renews the columnCount field.
+   *
+   * @return true if the cover is unate.
+   */
   public boolean isUnate() {
-    int variableCount = cubes.iterator().next().inputLength();
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
 
-    for (int i = 0; i < variableCount; i++) {
-      if (unateStatus(i) == 0)
+    columnCount();
+
+    for (int i = 0; i < cubes.getInputLength(); i++)
+      if (columnCount[0][i] != 0 && columnCount[1][i] != 0)
         return false;
-    }
 
     return true;
   }
@@ -157,19 +161,21 @@ public class Cover implements Iterable<Cube>{
    * @return primitive int, index of the chosen variable in the cubes of the cover.
    */
   private int binateSelect() {
-    int variableCount = cubes.iterator().next().inputLength();
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
+
+    int variableCount = cubes.getInputLength();
     int maxSum = -1;
     int maxIndex = -2;
 
-    for (int i = 0; i < variableCount; i++) {
-      if (cubes.getOneCount(i) == 0 || cubes.getZeroCount(i) == 0)
-        return -1;
-      if (cubes.getOneCount(i) + cubes.getZeroCount(i) > maxSum)
-        maxIndex = i;
-    }
+    if (isUnate())
+      return -1;
 
-    if (maxIndex == -2)
-      throw new UnsupportedOperationException("There is a bug in this method.");
+    for (int i = 0; i < variableCount; i++)
+      if (columnCount[1][i] + columnCount[0][i] > maxSum) {
+        maxIndex = i;
+        maxSum = columnCount[1][i] + columnCount[0][i];
+      }
 
     return maxIndex;
   }
@@ -190,13 +196,12 @@ public class Cover implements Iterable<Cube>{
   private Cover mergeWithContainment(Cover h0, Cover h1, Cube x, boolean contain) {
     Cover h2 = new Cover();
 
-    for (Cube i : h0.cubes) {
+    for (Cube i : h0.cubes)
       h1.cubes.stream().filter(i::equals).forEach(l -> {
         h2.cubes.add(i.copy());
         h0.cubes.remove(i);
         h1.cubes.remove(i);
       });
-    }
 
     if (!contain)
       return Cover.of(x.copy().complement()).intersect(h0).
@@ -246,13 +251,16 @@ public class Cover implements Iterable<Cube>{
    * @param cube {@link Cube}.
    * @return array of two {@link Cover}s.
    */
-  public Cover[] shannon(Cube cube) {
+  public Cover[] shannonCofactors(Cube cube) {
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
+
     Cover[] retValue = new Cover[2];
 
     Cube complement = new Cube(cube).complement();
 
-    retValue[0] = Cover.of(complement).intersect(cofactor(complement));
-    retValue[1] = Cover.of(cube).intersect(cofactor(cube));
+    retValue[0] = cofactor(complement);
+    retValue[1] = cofactor(cube);
 
     return retValue;
   }
@@ -269,6 +277,9 @@ public class Cover implements Iterable<Cube>{
    * @return {@link Cover}.
    */
   public Cover cofactor(Cube other) {
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
+
     Cover retValue = new Cover();
 
     for (Cube cube : cubes) {
@@ -287,6 +298,9 @@ public class Cover implements Iterable<Cube>{
    * @deprecated Although it works it is inefficient.
    */
   public void complement() {
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
+
     cubes.forEach(Cube::outputComplement);
   }
 
@@ -298,6 +312,9 @@ public class Cover implements Iterable<Cube>{
    * @return {@link Cover}.
    */
   public Cover complement(Cover cover) {
+    if (cubes.size() == 0)
+      throw new UnsupportedOperationException("Cube is empty!");
+
     Cover retValue = new Cover(cover);
     retValue.complement();
     return retValue;
@@ -358,10 +375,6 @@ public class Cover implements Iterable<Cube>{
    */
   public Cover difference(Cover other) {
     return intersect(complement(other));
-  }
-
-  public boolean isEmpty() {
-    return cubes.size() == 0;
   }
 }
 
