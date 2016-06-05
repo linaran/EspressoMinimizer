@@ -3,6 +3,8 @@ package espresso.lockEnviroment;
 import java.util.Collections;
 import java.util.Iterator;
 
+import static espresso.InputState.DONTCARE;
+
 /**
  * By definition cover is a set of cubes.
  * In a sense of boolean algebra, cover is a matrix representation
@@ -58,6 +60,10 @@ public class Cover implements Iterable<Cube> {
     return cubes.add(cube);
   }
 
+  public boolean addAll(Cover cover) {
+    return cubes.addAll(cover.cubes);
+  }
+
   public boolean remove(Cube cube) {
     return cubes.remove(cube);
   }
@@ -95,10 +101,6 @@ public class Cover implements Iterable<Cube> {
     return cubes.getOutputLength();
   }
 
-//////////////////////////////////////////////////////////////////////////////
-//  Espresso operations
-//////////////////////////////////////////////////////////////////////////////
-
   public int getOneColumnCount(int i) {
     return cubes.getOneColumnCount(i);
   }
@@ -106,6 +108,10 @@ public class Cover implements Iterable<Cube> {
   public int getZeroColumnCount(int i) {
     return cubes.getZeroColumnCount(i);
   }
+
+//////////////////////////////////////////////////////////////////////////////
+//  Espresso operations
+//////////////////////////////////////////////////////////////////////////////
 
   /**
    * This method renews the columnCount field.
@@ -132,7 +138,7 @@ public class Cover implements Iterable<Cube> {
    *
    * @return primitive int, index of the chosen variable in the cubes of the cover.
    */
-  private int binateSelect() {
+  public int binateSelect() {
     if (cubes.size() == 0)
       throw new UnsupportedOperationException("Cube is empty!");
 
@@ -165,7 +171,7 @@ public class Cover implements Iterable<Cube> {
    * @param contain if false then this method becomes mergeWithIdentity.
    * @return {@link Cover} before performing Shannon expansion on it.
    */
-  private Cover mergeWithContainment(Cover h0, Cover h1, Cube x, boolean contain) {
+  public Cover mergeWithContainment(Cover h0, Cover h1, Cube x, boolean contain) {
     Cover h2 = new Cover();
 
     for (Cube i : h0.cubes)
@@ -261,6 +267,24 @@ public class Cover implements Iterable<Cube> {
     }
 
     return retValue;
+  }
+
+  /**
+   * Method tells whether the cover has a row full
+   * of {@link espresso.InputState#DONTCARE} values.
+   *
+   * @return true if it has a row full of DONTCARE values.
+   */
+  public boolean hasDONTCARERow() {
+    for (Cube cube : this) {
+      for (int i = 0; i < cube.inputLength(); i++) {
+        if (cube.input(i) != DONTCARE)
+          break;
+        if (i + 1 == cube.inputLength())
+          return true;
+      }
+    }
+    return false;
   }
 
   /**
