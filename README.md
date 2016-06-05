@@ -1,4 +1,9 @@
+## Done/Refactor
+* InputState, OutputState, Containment, Cube, CubeSet, Cover
+* UnateComplement
+
+## Doing
+* Hardcore complement
+
 ## TODO
-* Find out how to properly store given truth tables.
-* Expand Implicant functionality if needed.
-* Keep it simple and stupid.
+* Tautology and core espresso loop.
