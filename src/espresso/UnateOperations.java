@@ -12,7 +12,6 @@ import static espresso.InputState.ONE;
 public class UnateOperations {
   private static int inputCount = 0;
   private static int outputCount = 0;
-  private static int splitIndex = 0;
 
   public UnateOperations() {
     throw new UnsupportedOperationException("nope..");
@@ -37,7 +36,9 @@ public class UnateOperations {
       return retValue;
     }
 
-    Cube splittingCube = splittingVariable(cover);
+    int splitIndex = splittingVariable(cover);
+    Cube splittingCube = new Cube(inputCount, outputCount);
+    splittingCube.setInput(ONE, splitIndex);
     Cover[] cofactors = cover.shannonCofactors(splittingCube);
 
 //    System.out.println("Splitting cubes:");
@@ -51,10 +52,10 @@ public class UnateOperations {
     Cover left;
     Cover right;
 
-    if (cover.getZeroColumnCount(splitIndex - 1) == 0) {
+    if (cover.getZeroColumnCount(splitIndex) == 0) {
       left = recursiveUnateComplement(cofactors[1]);
       right = Cover.of(splittingCube.copy().complement()).intersect(recursiveUnateComplement(cofactors[0]));
-    } else if (cover.getOneColumnCount(splitIndex - 1) == 0){
+    } else if (cover.getOneColumnCount(splitIndex) == 0) {
       left = Cover.of(splittingCube).intersect(recursiveUnateComplement(cofactors[1]));
       right = recursiveUnateComplement(cofactors[0]);
     } else {
@@ -84,32 +85,24 @@ public class UnateOperations {
   }
 
   private static boolean isTautology(Cover cover) {
-    for (Cube cube : cover) {
-      for (int i = 0; i < cube.inputLength(); i++) {
-        if (cube.input(i) != DONTCARE)
-          break;
-        if (i + 1 == cube.inputLength())
-          return true;
-      }
-    }
-    return false;
+    return cover.hasDONTCARERow();
   }
 
-  private static Cube splittingVariable(Cover cover) {
-//    Cube cube = largestCube(cover);
-//    int[][] columnCount = cover.getCurrentColumnCount();
-//    int maxSum = 0;
-//    int maxIndex = -1;
-//
-//    for (int i = 0; i < cube.inputLength(); i++) {
-//      if (columnCount[0][i] + columnCount[1][i] > maxSum) {
-//        maxIndex = i;
-//      }
-//    }
-//
-    Cube retValue = new Cube(inputCount, outputCount);
-    retValue.setInput(ONE, splitIndex++);
-    return retValue;
+  private static int splittingVariable(Cover cover) {
+    Cube cube = largestCube(cover);
+    int maxSum = 0;
+    int splitIndex = -1;
+
+    for (int i = 0; i < cube.inputLength(); i++) {
+      if (cube.input(i) == DONTCARE) continue;
+
+      if (cover.getOneColumnCount(i) + cover.getZeroColumnCount(i) > maxSum) {
+        maxSum = cover.getOneColumnCount(i) + cover.getZeroColumnCount(i);
+        splitIndex = i;
+      }
+    }
+
+    return splitIndex;
   }
 
   private static Cube largestCube(Cover cover) {
@@ -125,6 +118,7 @@ public class UnateOperations {
   }
 
   private static int dontcareCount(Cube cube) {
+//    TODO: Such data can be stored inside Cube to avoid looping.
     int retValue = 0;
     for (int i = 0; i < cube.inputLength(); i++) {
       if (cube.input(i) == DONTCARE)
