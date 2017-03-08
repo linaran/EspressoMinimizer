@@ -2,5 +2,8 @@
 /out/
 .gitignore~
 /src/fasty
-EspressoMinimizer.iml
 Scrap/
+.classpath
+.project
+EspressoMinimizer.*
+TODO.txt
