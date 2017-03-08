@@ -1,15 +1,13 @@
-package espresso.lockEnviroment;
+package espresso.boolFunction;
 
 import java.util.Collections;
 import java.util.Iterator;
 
-import static espresso.InputState.DONTCARE;
+import static espresso.boolFunction.InputState.DONTCARE;
 
 /**
  * By definition cover is a set of cubes.
- * In a sense of boolean algebra, cover is a matrix representation
- * of a boolean function.
- * TODO: unate recursive paradigm.
+ * In a sense of boolean algebra, cover is a matrix representation of a boolean function.
  */
 public class Cover implements Iterable<Cube> {
   private CubeSet cubes;
@@ -158,38 +156,6 @@ public class Cover implements Iterable<Cube> {
     return maxIndex;
   }
 
-  /**
-   * Given two subcovers obtained by the Shannon expansion with respect to the
-   * given {@link Cube}, this method computes a new {@link Cover}. A cover obtained
-   * by merging the two subcovers.<br/>
-   * Note: If the boolean flag in the method is false then this method becomes
-   * mergeWithIdentity.
-   *
-   * @param h0      {@link Cover} subcover obtained by the Shannon expansion.
-   * @param h1      {@link Cover} subcover obtained by the Shannon expansion.
-   * @param x       Shannon expansion was done with respect to this {@link Cube}.
-   * @param contain if false then this method becomes mergeWithIdentity.
-   * @return {@link Cover} before performing Shannon expansion on it.
-   */
-  public Cover mergeWithContainment(Cover h0, Cover h1, Cube x, boolean contain) {
-    Cover h2 = new Cover();
-
-    for (Cube i : h0.cubes)
-      h1.cubes.stream().filter(i::equals).forEach(l -> {
-        h2.cubes.add(i.copy());
-        h0.cubes.remove(i);
-        h1.cubes.remove(i);
-      });
-
-    if (!contain)
-      return Cover.of(x.copy().complement()).intersect(h0).
-          union(Cover.of(x).intersect(h1)).
-          union(h2);
-
-    throw new UnsupportedOperationException("Containment procedure not implemented yet.");
-//    TODO: Containment procedure implementation.
-  }
-
 //////////////////////////////////////////////////////////////////////////////
 //  Cover operations
 //////////////////////////////////////////////////////////////////////////////
@@ -235,7 +201,7 @@ public class Cover implements Iterable<Cube> {
 
     Cover[] retValue = new Cover[2];
 
-    Cube complement = new Cube(cube).complement();
+    Cube complement = new Cube(cube).inputComplement();
 
     retValue[0] = cofactor(complement);
     retValue[1] = cofactor(cube);
@@ -271,7 +237,7 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Method tells whether the cover has a row full
-   * of {@link espresso.InputState#DONTCARE} values.
+   * of {@link InputState#DONTCARE} values.
    *
    * @return true if it has a row full of DONTCARE values.
    */
@@ -289,7 +255,7 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Complements the cover. In place transformation.<br/>
-   * Note: Cover complement is just {@link Cube} output part complement.
+   * Note: Cover inputComplement is just {@link Cube} output part inputComplement.
    *
    * @deprecated Although it works it is inefficient.
    */
@@ -306,6 +272,7 @@ public class Cover implements Iterable<Cube> {
    *
    * @param cover {@link Cover}.
    * @return {@link Cover}.
+   * @deprecated Looks useless and wrong. At least time complexity is too big.
    */
   public Cover complement(Cover cover) {
     if (cubes.size() == 0)
@@ -346,7 +313,7 @@ public class Cover implements Iterable<Cube> {
    * @return {@link Cover}.
    */
   public Cover union(Cover other) {
-//    TODO: It is unclear how this method should be implemented.
+//    TODO: It is unclear how this method should be implemented. At least make a union of ON-SETS.
 //    TODO: A more compact union implementation is possible.
     Cover retValue = new Cover();
 
@@ -368,6 +335,7 @@ public class Cover implements Iterable<Cube> {
    *
    * @param other {@link Cover}.
    * @return {@link Cover}.
+   * @deprecated Using useless and wrong inputComplement function.
    */
   public Cover difference(Cover other) {
     return intersect(complement(other));

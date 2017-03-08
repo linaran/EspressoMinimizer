@@ -1,10 +1,11 @@
 package espresso;
 
-import espresso.lockEnviroment.Cover;
-import espresso.lockEnviroment.Cube;
+import espresso.boolFunction.Cover;
+import espresso.boolFunction.Cube;
+import espresso.minimizers.CoverUtility;
 
-import static espresso.InputState.ONE;
-import static espresso.InputState.ZERO;
+import static espresso.boolFunction.InputState.ONE;
+import static espresso.boolFunction.InputState.ZERO;
 
 /**
  * Complement
@@ -12,7 +13,6 @@ import static espresso.InputState.ZERO;
 public class Complement {
   private static int fInputCount = 0;
   private static int fOutputCount = 0;
-
 
   public static Cover complement(Cover f, Cover d) {
     if (f.size() == 0 || d.size() == 0)
@@ -53,15 +53,14 @@ public class Complement {
       if (f.getOneColumnCount(i) == f.size()) {
         c.setInput(ONE, i);
         cubeChanged = true;
-      }
-      else if (f.getZeroColumnCount(i) == f.size()) {
+      } else if (f.getZeroColumnCount(i) == f.size()) {
         c.setInput(ZERO, i);
         cubeChanged = true;
       }
     }
 
     if (cubeChanged) {
-      retValue.add(c.copy().complement());
+      retValue.add(c.copy().inputComplement());
       f = f.cofactor(c);
     }
     //endregion
@@ -73,7 +72,7 @@ public class Complement {
     Cover[] cofactors = f.shannonCofactors(splitCube);
 
     retValue.addAll(
-        f.mergeWithContainment(
+        CoverUtility.mergeWithContainment(
             singleOutputComplement(cofactors[1]),
             singleOutputComplement(cofactors[0]),
             splitCube,

@@ -1,4 +1,4 @@
-package espresso;
+package espresso.boolFunction;
 
 /**
  * Enum for maintaining containment relations.

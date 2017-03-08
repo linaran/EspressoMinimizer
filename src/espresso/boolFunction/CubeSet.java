@@ -1,6 +1,4 @@
-package espresso.lockEnviroment;
-
-import espresso.InputState;
+package espresso.boolFunction;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,7 +13,7 @@ import java.util.HashSet;
 public class CubeSet extends HashSet<Cube> {
   private int inputLength = 0;
   private int outputLength = 0;
-  private int[][] columnCount;
+  private int[][] bitCount;
 
   public CubeSet() {
   }
@@ -41,11 +39,11 @@ public class CubeSet extends HashSet<Cube> {
   }
 
   public int getOneColumnCount(int i) {
-    return columnCount[1][i];
+    return bitCount[1][i];
   }
 
   public int getZeroColumnCount(int i) {
-    return columnCount[0][i];
+    return bitCount[0][i];
   }
 
   @Override
@@ -59,16 +57,16 @@ public class CubeSet extends HashSet<Cube> {
 //      Basically full object construction is finished here. Looool.
       inputLength = cube.inputLength();
       outputLength = cube.outputLength();
-      columnCount = new int[2][inputLength];
+      bitCount = new int[2][inputLength];
     }
 
     for (int i = 0; i < inputLength; i++) {
       int newState = cube.input(i).valueOf();
       if (newState < 2)
-        columnCount[newState][i]++;
+        bitCount[newState][i]++;
     }
 
-    cube.setColumnCount(columnCount);
+    cube.setBitCount(bitCount);
     return super.add(cube);
   }
 
@@ -79,10 +77,10 @@ public class CubeSet extends HashSet<Cube> {
     for (int i = 0; i < inputLength; i++) {
       int oldState = cube.input(i).valueOf();
       if (oldState < 2)
-        columnCount[oldState][i]--;
+        bitCount[oldState][i]--;
     }
 
-    cube.setColumnCount(null);
+    cube.setBitCount(null);
     return super.remove(o);
   }
 }

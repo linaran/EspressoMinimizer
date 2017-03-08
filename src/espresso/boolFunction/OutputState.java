@@ -1,8 +1,6 @@
-package espresso;
+package espresso.boolFunction;
 
-import espresso.lockEnviroment.Cube;
-
-import static espresso.Containment.*;
+import static espresso.boolFunction.Containment.*;
 
 /**
  * Value representations for output entries in {@link Cube}.

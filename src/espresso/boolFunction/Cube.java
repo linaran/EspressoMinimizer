@@ -1,13 +1,9 @@
-package espresso.lockEnviroment;
-
-import espresso.Containment;
-import espresso.InputState;
-import espresso.OutputState;
+package espresso.boolFunction;
 
 import java.util.Arrays;
 
-import static espresso.InputState.*;
-import static espresso.OutputState.*;
+import static espresso.boolFunction.InputState.*;
+import static espresso.boolFunction.OutputState.*;
 
 /**
  * By definition cube consists of its input part and output part.<br/>
@@ -20,7 +16,12 @@ import static espresso.OutputState.*;
 public class Cube {
   private InputState[] input;
   private OutputState[] output;
-  private int[][] columnCount;
+
+  /**
+   * This field is is null if the {@link Cube} doesn't belong to a {@link Cover}.
+   * Otherwise this field is not null and it maintains same data as the {@link Cover}.
+   */
+  private int[][] bitCount;
 
   /**
    * See {@link #Cube(int, int)}.
@@ -188,13 +189,13 @@ public class Cube {
   }
 
   public void setInput(InputState inputState, int i) {
-    if (columnCount != null) {
+    if (bitCount != null) {
       int newState = inputState.valueOf();
 
       if (input[i] != null && input[i].valueOf() < 2)
-        columnCount[input[i].valueOf()][i]--;
+        bitCount[input[i].valueOf()][i]--;
       if (newState < 2)
-        columnCount[newState][i]++;
+        bitCount[newState][i]++;
     }
 
     input[i] = inputState; // okay
@@ -215,10 +216,10 @@ public class Cube {
   /**
    * This is a method and a field with close correlation to {@link Cover}.
    *
-   * @param columnCount primitive int[][]
+   * @param bitCount primitive int[][]
    */
-  public void setColumnCount(int[][] columnCount) {
-    this.columnCount = columnCount;
+  void setBitCount(int[][] bitCount) {
+    this.bitCount = bitCount;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -273,7 +274,7 @@ public class Cube {
   /**
    * Method returns a cube representing the cofactor of this
    * cube with respect to the given cube.<br/>
-   * Note: If this cube and the given cube have not intersection
+   * Note: If this cube and the given cube have no intersection
    * then the cofactor is an empty cube. The method will return null.<br/>
    * Warning: a.cofactor(b) and b.cofactor(a) won't yield same results!
    *
@@ -314,12 +315,13 @@ public class Cube {
 
   /**
    * Complements only the input part of the cube. The
-   * method represents classic implicant complement.
+   * method represents classic implicant inputComplement.
+   * In place transformation.
    *
    * @return this object, for convenience.
    * @see InputState#complement()
    */
-  public Cube complement() {
+  public Cube inputComplement() {
     for (int i = 0; i < input.length; i++)
       setInput(input[i].complement(), i);
 
