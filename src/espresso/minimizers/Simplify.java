@@ -5,12 +5,17 @@ import espresso.boolFunction.Cube;
 
 import static espresso.boolFunction.InputState.ONE;
 
-final public class Simplify {
+final public class Simplify implements BooleanMinimizer {
+  private static Simplify instance = new Simplify();
+
+  public static Simplify getInstance() {
+    return instance;
+  }
 
   private Simplify() {
   }
 
-  public static Cover minimize(Cover cover) {
+  public Cover minimize(Cover cover) {
     if (cover.isUnate()) {
       CoverUtility.singleCubeContainmentCleanup(cover);
       return cover;
