@@ -3,6 +3,7 @@ package espresso.minimizers;
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.Cube;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -72,8 +73,7 @@ final public class CoverUtility {
    * @param cover {@link Cover}
    */
   public static void singleCubeContainmentCleanup(Cover cover) {
-//    TODO: See if it can be optimized.
-    HashSet<Cube> deleteSet = new HashSet<>();
+    ArrayList<Cube> deleteSet = new ArrayList<>();
 
     for (Cube c1 : cover) {
       for (Cube c2 : cover) {

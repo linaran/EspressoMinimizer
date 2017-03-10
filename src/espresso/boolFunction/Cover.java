@@ -10,18 +10,16 @@ import static espresso.boolFunction.InputState.DONTCARE;
  * In a sense of boolean algebra, cover is a matrix representation of a boolean function.
  */
 public class Cover implements Iterable<Cube> {
-  private CubeSet cubes;
+  private CubeArray cubes;
 
   public Cover() {
-    cubes = new CubeSet();
+    cubes = new CubeArray();
   }
 
   public Cover(Cube... cubes) {
     if (cubes == null) throw new NullPointerException("Parameter can't be null.");
 
-    int inputLength = cubes[0].inputLength();
-    int outputLength = cubes[0].outputLength();
-    this.cubes = new CubeSet();
+    this.cubes = new CubeArray();
 
     Collections.addAll(this.cubes, cubes);
   }
@@ -32,7 +30,7 @@ public class Cover implements Iterable<Cube> {
    * @param cover {@link Cover}.
    */
   public Cover(Cover cover) {
-    cubes = new CubeSet(cover.cubes);
+    cubes = new CubeArray(cover.cubes);
   }
 
   public static Cover of(Cube... cubes) {
@@ -41,7 +39,7 @@ public class Cover implements Iterable<Cube> {
 
   @Override
   public Iterator<Cube> iterator() {
-    return cubes.iterator();
+    return cubes.new CubeArrayIterator();
   }
 
   @Override
@@ -66,6 +64,10 @@ public class Cover implements Iterable<Cube> {
     return cubes.remove(cube);
   }
 
+  public Cube get(int index) {
+    return cubes.get(index);
+  }
+
   /**
    * Number of cubes in the cover.
    *
@@ -76,24 +78,18 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Allowed input count for the cubes in the cover.
-   * If the method returns 0 then the cover is waiting
-   * for the first cube to be added to the set. After
-   * the first cube is added, allowed counts are fixed.
+   * Number of inputs for the {@link Cover}.
    *
-   * @return primitive int.
+   * @return int
    */
   public int inputCount() {
     return cubes.getInputLength();
   }
 
   /**
-   * Allowed output count for the cubes in the cover.
-   * If the method returns 0 then the cover is waiting
-   * for the first cube to be added to the set. After
-   * the first cube is added, allowed counts are fixed.
+   * Number of outputs for the {@link Cover}.
    *
-   * @return primitive int.
+   * @return int
    */
   public int outputCount() {
     return cubes.getOutputLength();
@@ -112,7 +108,11 @@ public class Cover implements Iterable<Cube> {
 //////////////////////////////////////////////////////////////////////////////
 
   /**
-   * This method renews the columnCount field.
+   * The method tells if this cover is unate.
+   * A cover is unate if it contains a column that doesn't have
+   * {@link InputState#ONE} and {@link InputState#ZERO} at the same time.
+   * For example a column with only {@link InputState#ONE} and
+   * {@link InputState#DONTCARE} indicates a unate cover.
    *
    * @return true if the cover is unate.
    */

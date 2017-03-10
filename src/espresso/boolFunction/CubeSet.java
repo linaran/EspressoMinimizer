@@ -10,6 +10,7 @@ import java.util.HashSet;
  * the whole set. That way there is no need to iterate over all of the cubes in order
  * to check certain properties of a cover.
  */
+@SuppressWarnings("Duplicates")
 public class CubeSet extends HashSet<Cube> {
   private int inputLength = 0;
   private int outputLength = 0;
@@ -83,4 +84,5 @@ public class CubeSet extends HashSet<Cube> {
     cube.setBitCount(null);
     return super.remove(o);
   }
+
 }

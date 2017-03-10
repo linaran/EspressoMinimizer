@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-@SuppressWarnings("Duplicates")
-public class CubeArray extends ArrayList<Cube> implements Iterable<Cube> {
+public class CubeArray extends ArrayList<Cube> {
   private int inputLength = 0;
   private int outputLength = 0;
+
+  /**
+   * This reference is shared among all {@link Cube}s contained in this data structure.
+   * This is because one cube can choose to change its values and the data structure needs
+   * to be aware of these changes.
+   */
   private int[][] bitCount;
 
   private void validateCube(Cube cube) {
@@ -22,6 +27,32 @@ public class CubeArray extends ArrayList<Cube> implements Iterable<Cube> {
     inputLength = cube.inputLength();
     outputLength = cube.outputLength();
     bitCount = new int[2][inputLength];
+  }
+
+  private void removeMaintenance(Cube cube) {
+    for (int i = 0; i < inputLength; i++) {
+      int oldState = cube.input(i).valueOf();
+      if (oldState < 2)
+        bitCount[oldState][i]--;
+    }
+
+    cube.setBitCount(null);
+  }
+
+  private void addMaintenance(Cube cube) {
+    if (inputLength != 0 && outputLength != 0) {
+      validateCube(cube);
+    } else {
+      initializeData(cube);
+    }
+
+    for (int i = 0; i < inputLength; i++) {
+      int newState = cube.input(i).valueOf();
+      if (newState < 2)
+        bitCount[newState][i]++;
+    }
+
+    cube.setBitCount(bitCount);
   }
 
   public CubeArray(int initialCapacity) {
@@ -52,94 +83,54 @@ public class CubeArray extends ArrayList<Cube> implements Iterable<Cube> {
   }
 
   @Override
-  public Iterator<Cube> iterator() {
-    return new CubeArrayIterator();
-  }
-
-  @Override
   public boolean add(Cube cube) {
-    if (inputLength != 0 && outputLength != 0) {
-      validateCube(cube);
-    } else {
-      initializeData(cube);
-    }
-
-    for (int i = 0; i < inputLength; i++) {
-      int newState = cube.input(i).valueOf();
-      if (newState < 2)
-        bitCount[newState][i]++;
-    }
-
-    cube.setBitCount(bitCount);
-
+    addMaintenance(cube);
     return super.add(cube);
   }
 
   @Override
   public void add(int index, Cube cube) {
-    if (inputLength != 0 && outputLength != 0) {
-      validateCube(cube);
-    } else {
-      initializeData(cube);
-    }
-
-    for (int i = 0; i < inputLength; i++) {
-      int newState = cube.input(i).valueOf();
-      if (newState < 2)
-        bitCount[newState][i]++;
-    }
-
-    cube.setBitCount(bitCount);
-
+    addMaintenance(cube);
     super.add(index, cube);
   }
 
   @Override
   public Cube remove(int index) {
     Cube cube = get(index);
-
-    for (int i = 0; i < inputLength; i++) {
-      int oldState = cube.input(i).valueOf();
-      if (oldState < 2)
-        bitCount[oldState][i]--;
-    }
-
-    cube.setBitCount(null);
-
+    removeMaintenance(cube);
     return super.remove(index);
   }
 
   @Override
   public boolean remove(Object o) {
     Cube cube = (Cube) o;
-
-    for (int i = 0; i < inputLength; i++) {
-      int oldState = cube.input(i).valueOf();
-      if (oldState < 2)
-        bitCount[oldState][i]--;
-    }
-
-    cube.setBitCount(null);
+    removeMaintenance(cube);
     return super.remove(o);
   }
 
+  /**
+   * A wrapper around default {@link ArrayList} iterator in order to properly maintain
+   * {@link CubeArray#bitCount} values.
+   */
   public class CubeArrayIterator implements Iterator<Cube> {
-    private ArrayList<Cube> list = CubeArray.this;
-    private int index = 0;
+    private Iterator<Cube> iterator = CubeArray.this.iterator();
+    private Cube currentCube;
 
     @Override
     public boolean hasNext() {
-      return index < list.size();
+      return iterator.hasNext();
     }
 
     @Override
     public Cube next() {
-      return list.get(index++);
+      currentCube = iterator.next();
+      return currentCube;
     }
 
     @Override
     public void remove() {
-      list.remove(index);
+//      CubeArray.this.removeMaintenance(currentCube);
+      iterator.remove();
     }
   }
 }
