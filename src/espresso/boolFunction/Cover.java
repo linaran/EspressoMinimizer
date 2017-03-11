@@ -1,6 +1,5 @@
 package espresso.boolFunction;
 
-import java.util.Collections;
 import java.util.Iterator;
 
 import static espresso.boolFunction.InputState.DONTCARE;
@@ -21,7 +20,9 @@ public class Cover implements Iterable<Cube> {
 
     this.cubes = new CubeArray();
 
-    Collections.addAll(this.cubes, cubes);
+    for (Cube cube : cubes) {
+      this.cubes.add(cube);
+    }
   }
 
   /**
@@ -52,12 +53,12 @@ public class Cover implements Iterable<Cube> {
     return retValue;
   }
 
-  public boolean add(Cube cube) {
-    return cubes.add(cube);
+  public void add(Cube cube) {
+    cubes.add(cube);
   }
 
-  public boolean addAll(Cover cover) {
-    return cubes.addAll(cover.cubes);
+  public void addAll(Cover cover) {
+    cubes.addAll(cover.cubes);
   }
 
   public boolean remove(Cube cube) {
@@ -159,31 +160,6 @@ public class Cover implements Iterable<Cube> {
 //////////////////////////////////////////////////////////////////////////////
 //  Cover operations
 //////////////////////////////////////////////////////////////////////////////
-
-//  /**
-//   * Method tells how monotone this cover is. Cover can be increasing
-//   * monotone, decreasing monotone or not monotone at all. A cover is
-//   * increasing/decreasing monotone if it is increasing/decreasing
-//   * monotone in all of it's input variables. For a full explanation
-//   * see {@link Cover#unateStatus(int)}. <br/>
-//   * Note: Unate positive/negative is a synonym for monotone increasing/decreasing.
-//   *
-//   * @return primitive int 1 is positive unate, -1 is negative unate, 0 isn't unate.
-//   */
-//  public int unateStatus() {
-//    int variableCount = cubes.iterator().next().inputLength();
-//    boolean increasing = true;
-//    boolean decreasing = true;
-//
-//    for (int i = 0; i < variableCount; i++) {
-//      if (unateStatus(i) == 1) decreasing = false;
-//      if (unateStatus(i) == -1) increasing = false;
-//      if (!decreasing && !increasing) return 0;
-//    }
-//
-//    if (increasing) return 1;
-//    return -1;
-//  }
 
   /**
    * Method returns the Shannon expansion of this cover with

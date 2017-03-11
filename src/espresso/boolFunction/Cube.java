@@ -18,10 +18,10 @@ public class Cube {
   private OutputState[] output;
 
   /**
-   * This field is is null if the {@link Cube} doesn't belong to a {@link Cover}.
-   * Otherwise this field is not null and it maintains same data as the {@link Cover}.
+   * This field is is null if the {@link Cube} doesn't belong to a {@link Cover} or {@link CubeArray}.
+   * Otherwise this field is not null and shares this field with a {@link CubeArray}.
    */
-  private int[][] bitCount;
+  private int[][] bitCount = null;
 
   /**
    * See {@link #Cube(int, int)}.
@@ -217,11 +217,21 @@ public class Cube {
    * This is a method and a field with close correlation to {@link Cover}.
    *
    * @param bitCount primitive int[][]
+   * @see Cube#bitCount
    */
   void setBitCount(int[][] bitCount) {
     this.bitCount = bitCount;
   }
 
+  /**
+   * This method is closely related to {@link Cover}.
+   *
+   * @return true this {@link Cube} belongs to a {@link CubeArray} or {@link Cover}.
+   * @see Cube#bitCount
+   */
+  boolean isBitCountTaken() {
+    return bitCount != null;
+  }
   //////////////////////////////////////////////////////////////////////////////
 //  Cube operations
 //////////////////////////////////////////////////////////////////////////////

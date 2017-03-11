@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class CubeArray extends ArrayList<Cube> {
+public class CubeArray implements Iterable<Cube> {
+  ArrayList<Cube> list;
+
   private int inputLength = 0;
   private int outputLength = 0;
 
@@ -14,6 +16,28 @@ public class CubeArray extends ArrayList<Cube> {
    * to be aware of these changes.
    */
   private int[][] bitCount;
+
+  public CubeArray(int initialCapacity) {
+    list = new ArrayList<>(initialCapacity);
+  }
+
+  public CubeArray() {
+    list = new ArrayList<>();
+  }
+
+  public CubeArray(Collection<? extends Cube> c) {
+    list = new ArrayList<>(c);
+  }
+
+  /**
+   * Copy constructor.
+   *
+   * @param cubeArray {@link CubeArray}
+   */
+  public CubeArray(CubeArray cubeArray) {
+    list = new ArrayList<>();
+    addAll(cubeArray);
+  }
 
   private void validateCube(Cube cube) {
     if (inputLength != cube.inputLength() || outputLength != cube.outputLength()) {
@@ -55,15 +79,8 @@ public class CubeArray extends ArrayList<Cube> {
     cube.setBitCount(bitCount);
   }
 
-  public CubeArray(int initialCapacity) {
-    super(initialCapacity);
-  }
-
-  public CubeArray() {
-  }
-
-  public CubeArray(Collection<? extends Cube> c) {
-    super(c);
+  public int size() {
+    return list.size();
   }
 
   public int getInputLength() {
@@ -82,30 +99,76 @@ public class CubeArray extends ArrayList<Cube> {
     return bitCount[0][i];
   }
 
-  @Override
-  public boolean add(Cube cube) {
-    addMaintenance(cube);
-    return super.add(cube);
+  public Cube get(int index) {
+    return list.get(index);
   }
 
-  @Override
+  /**
+   * Add a given {@link Cube} to the array.
+   * Note: Don't add add cubes directly from another {@link Cover}
+   * or {@link CubeArray}.
+   *
+   * @param cube {@link Cube}
+   */
+  public void add(Cube cube) {
+    if (cube.isBitCountTaken()) {
+      throw new IllegalArgumentException(
+          "This cube already belongs to a CubeArray or Cover. Copy it."
+      );
+    }
+
+    addMaintenance(cube);
+    list.add(cube);
+  }
+
+  /**
+   * Adds copies of {@link Cube}s inside given collection.
+   *
+   * @param c {@link Collection}
+   */
+  public void addAll(Collection<? extends Cube> c) {
+    for (Cube cube : c) {
+      add(cube.copy());
+    }
+  }
+
+  /**
+   * Adds copies of {@link Cube}s from another {@link CubeArray}.
+   *
+   * @param cubes {@link CubeArray}
+   */
+  public void addAll(CubeArray cubes) {
+    for (Cube cube : cubes) {
+      add(cube.copy());
+    }
+  }
+
   public void add(int index, Cube cube) {
+    if (cube.isBitCountTaken()) {
+      throw new IllegalArgumentException(
+          "This cube already belongs to a CubeArray or Cover. Copy it."
+      );
+    }
+
     addMaintenance(cube);
-    super.add(index, cube);
+    list.add(index, cube);
   }
 
-  @Override
   public Cube remove(int index) {
-    Cube cube = get(index);
+    Cube cube = list.get(index);
     removeMaintenance(cube);
-    return super.remove(index);
+    return list.remove(index);
   }
 
-  @Override
   public boolean remove(Object o) {
     Cube cube = (Cube) o;
     removeMaintenance(cube);
-    return super.remove(o);
+    return list.remove(o);
+  }
+
+  @Override
+  public Iterator<Cube> iterator() {
+    return new CubeArrayIterator();
   }
 
   /**
@@ -113,23 +176,23 @@ public class CubeArray extends ArrayList<Cube> {
    * {@link CubeArray#bitCount} values.
    */
   public class CubeArrayIterator implements Iterator<Cube> {
-    private Iterator<Cube> iterator = CubeArray.this.iterator();
+    private Iterator<Cube> iterator = CubeArray.this.list.iterator();
     private Cube currentCube;
 
-    @Override
+
     public boolean hasNext() {
       return iterator.hasNext();
     }
 
-    @Override
+
     public Cube next() {
       currentCube = iterator.next();
       return currentCube;
     }
 
-    @Override
+
     public void remove() {
-//      CubeArray.this.removeMaintenance(currentCube);
+      CubeArray.this.removeMaintenance(currentCube);
       iterator.remove();
     }
   }

@@ -4,7 +4,6 @@ import espresso.boolFunction.Cover;
 import espresso.boolFunction.Cube;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 
 final public class CoverUtility {
@@ -51,11 +50,11 @@ final public class CoverUtility {
         Cube c2 = iter2.next();
 
         if (c1.generalContain(c2)) {
-          h3.add(c2);
           iter2.remove();
+          h3.add(c2);
         } else if (c2.generalContain(c1)) {
-          h3.add(c1);
           iter1.remove();
+          h3.add(c1);
         }
       }
     }
