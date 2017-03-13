@@ -102,4 +102,10 @@ public enum OutputState {
     Containment containment = outputContainment[numState - 3][other.valueOf() - 3];
     return containment == CONTAIN || containment == STRICT_CONTAIN;
   }
+
+
+  @Override
+  public String toString() {
+    return String.valueOf(numState);
+  }
 }

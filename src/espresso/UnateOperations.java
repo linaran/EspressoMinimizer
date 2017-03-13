@@ -37,7 +37,7 @@ public class UnateOperations {
     int splitIndex = splittingVariable(cover);
     Cube splittingCube = new Cube(inputCount, outputCount);
     splittingCube.setInput(ONE, splitIndex);
-    Cover[] cofactors = cover.shannonCofactors(splittingCube);
+    Cover[] cofactors = cover.shannonCofactors(splitIndex);
 
     //region Debug
 //    System.out.println("Splitting cubes:");

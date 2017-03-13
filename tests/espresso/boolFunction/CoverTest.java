@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.Iterator;
 
 import static espresso.boolFunction.InputState.*;
-import static espresso.boolFunction.OutputState.OUTPUT;
+import static espresso.boolFunction.OutputState.*;
 import static org.junit.Assert.*;
 
 
@@ -99,5 +99,48 @@ public class CoverTest {
           cubes.getOneColumnCount(i)
       );
     }
+  }
+
+  @Test
+  public void shannonCofactors() throws Exception {
+    Cover cover = new Cover(
+        new Cube(new InputState[]{ONE, ONE, ZERO, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ZERO, ONE, DONTCARE, ZERO}, new OutputState[]{OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ONE, ONE, ONE, ONE}, new OutputState[]{OUTPUT, NOT_OUTPUT})
+    );
+
+    Cover[] cofactors = cover.shannonCofactors(3);
+
+    assertTrue(
+        "Negative cofactor size is not right.",
+        cofactors[0].size() == 2
+    );
+    assertTrue(
+        "Positive cofactor size is not right.",
+        cofactors[1].size() == 2
+    );
+
+    Cover actualPositiveCofactor = cofactors[1];
+    Cover actualNegativeCofactor = cofactors[0];
+
+    Cover expectedPositiveCofactor = new Cover(
+        new Cube(new InputState[]{ONE, ONE, ZERO, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ONE, ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT, NOT_OUTPUT})
+    );
+    Cover expectedNegativeCofactor = new Cover(
+        new Cube(new InputState[]{ONE, ONE, ZERO, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ZERO, ONE, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT})
+    );
+
+    assertEquals(
+        "Negative cofactor is incorrect.",
+        expectedNegativeCofactor,
+        actualNegativeCofactor
+    );
+    assertEquals(
+        "Positive cofactor is incorrect.",
+        expectedPositiveCofactor,
+        actualPositiveCofactor
+    );
   }
 }

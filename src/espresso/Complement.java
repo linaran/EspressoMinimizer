@@ -69,7 +69,7 @@ public class Complement {
     Cube splitCube = new Cube(f.inputCount(), f.outputCount());
     splitCube.setInput(ONE, splitIndex);
 
-    Cover[] cofactors = f.shannonCofactors(splitCube);
+    Cover[] cofactors = f.shannonCofactors(splitIndex);
 
     retValue.addAll(
         CoverUtility.mergeWithContainment(

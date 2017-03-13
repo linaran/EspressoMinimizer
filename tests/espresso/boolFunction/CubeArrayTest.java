@@ -3,6 +3,7 @@ package espresso.boolFunction;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static espresso.boolFunction.InputState.*;
@@ -104,5 +105,58 @@ public class CubeArrayTest {
           cubes.getOneColumnCount(i)
       );
     }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void cubeArrayShouldNotAcceptIncompatibleCubes() throws Exception {
+    Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
+    Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
+    Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
+
+    CubeArray cubes = new CubeArray();
+    cubes.addAll(Arrays.asList(cube1, cube2, cube3));
+
+    Cube wrongCube = new Cube(new InputState[]{ONE}, new OutputState[]{OUTPUT});
+    cubes.add(wrongCube);
+  }
+
+  @Test
+  public void emptyCubeArrayShouldAcceptAnyCubeIteratorCase() throws Exception {
+    Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
+    Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
+    Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
+
+    CubeArray cubes = new CubeArray();
+    cubes.addAll(Arrays.asList(cube1, cube2, cube3));
+
+    for (Iterator<Cube> iterator = cubes.iterator(); iterator.hasNext(); ) {
+      iterator.next();
+      iterator.remove();
+    }
+
+    assertTrue(
+        "Cube wasn't empty.",
+        cubes.size() == 0
+    );
+
+    Cube wrongCube = new Cube(new InputState[]{ONE}, new OutputState[]{OUTPUT});
+    cubes.add(wrongCube);
+  }
+
+  @Test
+  public void emptyCubeArrayShouldAcceptAnyCubeRemoveCase() throws Exception {
+    Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
+    CubeArray cubes = new CubeArray();
+
+    cubes.add(cube1);
+    cubes.remove(cube1);
+
+    assertTrue(
+        "Cube wasn't empty.",
+        cubes.size() == 0
+    );
+
+    Cube wrongCube = new Cube(new InputState[]{ONE}, new OutputState[]{OUTPUT});
+    cubes.add(wrongCube);
   }
 }

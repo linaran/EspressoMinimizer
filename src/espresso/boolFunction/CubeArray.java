@@ -61,6 +61,10 @@ public class CubeArray implements Iterable<Cube> {
     }
 
     cube.setBitCount(null);
+
+    if (list.size() == 0) {
+      inputLength = outputLength = 0;
+    }
   }
 
   private void addMaintenance(Cube cube) {
@@ -111,14 +115,19 @@ public class CubeArray implements Iterable<Cube> {
    * @param cube {@link Cube}
    */
   public void add(Cube cube) {
+    if (cube == null) {
+      return;
+    }
+
     if (cube.isBitCountTaken()) {
       throw new IllegalArgumentException(
           "This cube already belongs to a CubeArray or Cover. Copy it."
       );
     }
 
-    addMaintenance(cube);
-    list.add(cube);
+    if (list.add(cube)) {
+      addMaintenance(cube);
+    }
   }
 
   /**
@@ -160,10 +169,11 @@ public class CubeArray implements Iterable<Cube> {
     return list.remove(index);
   }
 
-  public boolean remove(Object o) {
+  public void remove(Object o) {
     Cube cube = (Cube) o;
-    removeMaintenance(cube);
-    return list.remove(o);
+    if (list.remove(o)) {
+      removeMaintenance(cube);
+    }
   }
 
   @Override
@@ -190,10 +200,9 @@ public class CubeArray implements Iterable<Cube> {
       return currentCube;
     }
 
-
     public void remove() {
-      CubeArray.this.removeMaintenance(currentCube);
       iterator.remove();
+      CubeArray.this.removeMaintenance(currentCube);
     }
   }
 }

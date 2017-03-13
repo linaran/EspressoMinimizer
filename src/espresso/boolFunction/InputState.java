@@ -28,7 +28,6 @@ public enum InputState {
   }
 
   public static InputState and(InputState o1, InputState o2) {
-//    TODO: Refactor to work as ONE.and(ZERO);
     if (o1 == EMPTY || o2 == EMPTY)
       throw new IllegalArgumentException("One of the input states are empty.");
 
@@ -44,6 +43,7 @@ public enum InputState {
   public InputState complement() {
     if (this == EMPTY)
       throw new UnsupportedOperationException("Complement of an empty cube doesn't exist.");
+
     if (this == DONTCARE) return DONTCARE;
 
     return this == ONE ? ZERO : ONE;
@@ -112,5 +112,11 @@ public enum InputState {
   public boolean generalContains(InputState other) {
     Containment containment = inputContainment[numState][other.valueOf()];
     return containment == CONTAIN || containment == STRICT_CONTAIN;
+  }
+
+
+  @Override
+  public String toString() {
+    return String.valueOf(numState);
   }
 }

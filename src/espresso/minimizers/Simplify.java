@@ -16,6 +16,10 @@ final public class Simplify implements BooleanMinimizer {
   }
 
   public Cover minimize(Cover cover) {
+    if (cover.size() == 0) {
+      return cover;
+    }
+
     if (cover.isUnate()) {
       CoverUtility.singleCubeContainmentCleanup(cover);
       return cover;
@@ -25,11 +29,14 @@ final public class Simplify implements BooleanMinimizer {
     Cube splitCube = new Cube(cover.inputCount(), cover.outputCount());
     splitCube.setInput(ONE, splitIndex);
 
-    Cover[] cofactors = cover.shannonCofactors(splitCube);
+    Cover[] cofactors = cover.shannonCofactors(splitIndex);
 
+//    System.out.println("Split index: " + splitIndex);
+
+    Cover intersect1, intersect2;
     Cover newCover = CoverUtility.mergeWithContainment(
-        minimize(cofactors[0]),
-        minimize(cofactors[1]),
+        intersect1 = minimize(cofactors[0]),
+        intersect2 = minimize(cofactors[1]),
         splitCube,
         true
     );
@@ -49,7 +56,7 @@ final public class Simplify implements BooleanMinimizer {
 //    System.out.println(intersect2.toString());
 //    System.out.println("New cover:");
 //    System.out.println(newCover.toString());
-    //endregion
+    //    endregion
 
 //    New cover must not be empty.
     if (newCover.size() != 0 && newCover.size() < cover.size()) {

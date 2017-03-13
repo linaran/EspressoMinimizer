@@ -50,23 +50,11 @@ public class Cube {
     totalUniverseInit(inputCount, outputCount);
   }
 
-//  /**
-//   * Convenient way to create a cube representation of a single
-//   * input variable.
-//   *
-//   * @param inputCount  primitive int.
-//   * @param outputCount primitive int.
-//   * @param index       primitive int.
-//   */
-//  public Cube(int inputCount, int outputCount, int index) {
-//    totalUniverseInit(inputCount, outputCount);
-//    input[index] = ONE;
-//  }
-
   /**
    * Creates a new cube with the given array of input and output states.
    * Note: given parameters are value-copied so there are no implicit
-   * reference chains.
+   * reference chains. Also the new copied cube is free to be added to
+   * any {@link CubeArray} or {@link Cover}.
    *
    * @param input  array of {@link InputState}s.
    * @param output array of {@link OutputState}s.
@@ -310,8 +298,10 @@ public class Cube {
   }
 
   /**
-   * Complements the output part of the cube.
-   * This is an in place transformation.
+   * This method runs over all outputs of the cube and
+   * complements all states individually.
+   * Warning: This is not a correct way to complement a cube.
+   * For that see {@link Cube#complement()}.
    *
    * @return this object for convenience.
    * @see OutputState#complement()
@@ -324,18 +314,52 @@ public class Cube {
   }
 
   /**
-   * Complements only the input part of the cube. The
-   * method represents classic implicant inputComplement.
-   * In place transformation.
+   * This method runs over all inputs of the cube and
+   * complements all states individually.
+   * <p>
+   * Warning: This is not a correct way to complement a cube.
+   * For that see {@link Cube#complement()}.
    *
    * @return this object, for convenience.
    * @see InputState#complement()
+   * @see Cube#complement()
    */
   public Cube inputComplement() {
     for (int i = 0; i < input.length; i++)
       setInput(input[i].complement(), i);
 
     return this;
+  }
+
+  /**
+   * This method correctly complements a cube according
+   * to De Morgan's laws. Therefore a complement of this
+   * cube will actually be a {@link Cover} of a boolean
+   * function that represents a complement for this cube.
+   * <p>
+   * The size of the {@link Cover} will range from 0 to
+   * the number of inputs that the cube has.
+   *
+   * @return {@link Cover}
+   */
+  public Cover complement() {
+    Cover retValue = new Cover();
+
+    for (int i = 0; i < input.length; ++i) {
+      InputState literal = input[i];
+      if (literal == ONE || literal == ZERO) {
+        InputState[] newInputs = new InputState[input.length];
+        Arrays.fill(newInputs, DONTCARE);
+        newInputs[i] = literal.complement();
+
+        OutputState[] outputCopy = new OutputState[output.length];
+        System.arraycopy(output, 0, outputCopy, 0, output.length);
+
+        retValue.add(new Cube(newInputs, outputCopy));
+      }
+    }
+
+    return retValue;
   }
 
   /**
@@ -441,6 +465,24 @@ public class Cube {
     for (int i = 0; i < output.length; i++)
       if (!output[i].generalContains(other.output[i]))
         return false;
+
+    return true;
+  }
+
+  public boolean strictContain(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length)
+      throw new IllegalArgumentException("Cube lengths are not compatible.");
+
+    for (int i = 0; i < input.length; ++i) {
+      if (!input[i].strictContains(other.input[i])) {
+        return false;
+      }
+    }
+    for (int i = 0; i < output.length; ++i) {
+      if (!output[i].strictContains(other.output[i])) {
+        return false;
+      }
+    }
 
     return true;
   }

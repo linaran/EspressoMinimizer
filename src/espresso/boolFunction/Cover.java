@@ -1,8 +1,14 @@
 package espresso.boolFunction;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static espresso.boolFunction.InputState.DONTCARE;
+import static espresso.boolFunction.InputState.ONE;
 
 /**
  * By definition cover is a set of cubes.
@@ -34,6 +40,30 @@ public class Cover implements Iterable<Cube> {
     cubes = new CubeArray(cover.cubes);
   }
 
+  /**
+   * Reads only single output functions for now.
+   *
+   * @param filepath  {@link String}
+   * @param splitChar {@link String}
+   * @throws IOException If file not found or some other IO error occurs.
+   */
+  public Cover(String filepath, String splitChar) throws IOException {
+    cubes = new CubeArray();
+
+    try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
+      for (String line = br.readLine(); line != null; line = br.readLine()) {
+        String[] split = line.split(splitChar);
+        InputState[] inputStates = new InputState[split.length];
+
+        for (int i = 0; i < split.length; ++i) {
+          inputStates[i] = InputState.values()[Integer.valueOf(split[i])];
+        }
+
+        cubes.add(new Cube(inputStates, new OutputState[]{OutputState.OUTPUT}));
+      }
+    }
+  }
+
   public static Cover of(Cube... cubes) {
     return new Cover(cubes);
   }
@@ -61,8 +91,8 @@ public class Cover implements Iterable<Cube> {
     cubes.addAll(cover.cubes);
   }
 
-  public boolean remove(Cube cube) {
-    return cubes.remove(cube);
+  public void remove(Cube cube) {
+    cubes.remove(cube);
   }
 
   public Cube get(int index) {
@@ -119,7 +149,7 @@ public class Cover implements Iterable<Cube> {
    */
   public boolean isUnate() {
     if (cubes.size() == 0)
-      throw new UnsupportedOperationException("Cube is empty!");
+      throw new UnsupportedOperationException("Cover is empty!");
 
     for (int i = 0; i < cubes.getInputLength(); i++)
       if (getZeroColumnCount(i) != 0 && getOneColumnCount(i) != 0)
@@ -148,11 +178,19 @@ public class Cover implements Iterable<Cube> {
     if (isUnate())
       return -1;
 
-    for (int i = 0; i < variableCount; i++)
-      if (getOneColumnCount(i) + getZeroColumnCount(i) > maxSum) {
-        maxIndex = i;
-        maxSum = getOneColumnCount(i) + getZeroColumnCount(i);
+    for (int i = 0; i < variableCount; i++) {
+      int zeroColumnCount = getZeroColumnCount(i);
+      int oneColumnCount = getOneColumnCount(i);
+
+      if (zeroColumnCount == 0 || oneColumnCount == 0) {
+        continue;
       }
+
+      if (zeroColumnCount + oneColumnCount > maxSum) {
+        maxIndex = i;
+        maxSum = zeroColumnCount + oneColumnCount;
+      }
+    }
 
     return maxIndex;
   }
@@ -163,24 +201,30 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Method returns the Shannon expansion of this cover with
-   * regard to the given cube. The Shannon expansion is returned
+   * regard to the column which is denoted by the split index.
+   * The Shannon expansion is returned
    * as an array of two covers. Negative part of the Shannon expansion
    * is at index 0 while the positive part of the expansion is at index 1.<br/>
    * Note: Returned array can contain covers that have no {@link Cube}s at all.
    *
-   * @param cube {@link Cube}.
+   * @param splitIndex splitting index.
    * @return array of two {@link Cover}s.
    */
-  public Cover[] shannonCofactors(Cube cube) {
-    if (cubes.size() == 0)
+  public Cover[] shannonCofactors(int splitIndex) {
+    if (splitIndex < 0 || splitIndex >= inputCount()) {
+      throw new IllegalArgumentException("Split index is out range for input size of this cover.");
+    }
+    if (cubes.size() == 0) {
       throw new UnsupportedOperationException("Cube is empty!");
+    }
+
+    Cube splitCube = new Cube(inputCount(), outputCount());
+    splitCube.setInput(ONE, splitIndex);
+    Cube complement = new Cube(splitCube).inputComplement();
 
     Cover[] retValue = new Cover[2];
-
-    Cube complement = new Cube(cube).inputComplement();
-
     retValue[0] = cofactor(complement);
-    retValue[1] = cofactor(cube);
+    retValue[1] = cofactor(splitCube);
 
     return retValue;
   }
@@ -315,6 +359,51 @@ public class Cover implements Iterable<Cube> {
    */
   public Cover difference(Cover other) {
     return intersect(complement(other));
+  }
+
+  /**
+   * Function to be used in {@link Cover#equals(Object)}.
+   * Tells if this cover contains a cube that is LITERALLY
+   * identical to the given {@link Cube}.
+   *
+   * @param cube {@link Cube}
+   * @return true if the cube is found
+   */
+  private boolean containsCube(Cube cube) {
+    for (Cube c : this) {
+      if (c.equals(cube)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Use for debug purposes only and use it on small covers.
+   *
+   * @param obj {@link Object}
+   * @return true if equal otherwise false.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Cover)) {
+      return false;
+    }
+
+    Cover other = (Cover) obj;
+
+    if (size() != other.size()) {
+      return false;
+    }
+
+    for (Cube cube : this) {
+      if (!other.containsCube(cube)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
