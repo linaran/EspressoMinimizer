@@ -1,5 +1,6 @@
 package espresso.boolFunction;
 
+import espresso.boolFunction.cube.Cube;
 import org.junit.Test;
 
 import java.util.Iterator;

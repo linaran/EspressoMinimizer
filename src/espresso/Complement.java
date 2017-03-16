@@ -1,7 +1,7 @@
 package espresso;
 
 import espresso.boolFunction.Cover;
-import espresso.boolFunction.Cube;
+import espresso.boolFunction.cube.Cube;
 import espresso.minimizers.CoverUtility;
 
 import static espresso.boolFunction.InputState.ONE;

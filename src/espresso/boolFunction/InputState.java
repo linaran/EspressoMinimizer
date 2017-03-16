@@ -1,5 +1,7 @@
 package espresso.boolFunction;
 
+import espresso.boolFunction.cube.Cube;
+
 import static espresso.boolFunction.Containment.*;
 
 /**

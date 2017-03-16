@@ -1,4 +1,9 @@
-package espresso.boolFunction;
+package espresso.boolFunction.cube;
+
+import espresso.boolFunction.Containment;
+import espresso.boolFunction.Cover;
+import espresso.boolFunction.InputState;
+import espresso.boolFunction.OutputState;
 
 import java.util.Arrays;
 
@@ -469,24 +474,6 @@ public class Cube {
     return true;
   }
 
-  public boolean strictContain(Cube other) {
-    if (input.length != other.input.length || output.length != other.output.length)
-      throw new IllegalArgumentException("Cube lengths are not compatible.");
-
-    for (int i = 0; i < input.length; ++i) {
-      if (!input[i].strictContains(other.input[i])) {
-        return false;
-      }
-    }
-    for (int i = 0; i < output.length; ++i) {
-      if (!output[i].strictContains(other.output[i])) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   /**
    * A {@link Cube} is regarded empty when one of the input parts
    * is {@link InputState#EMPTY} or all of the output parts are {@link OutputState#NOT_OUTPUT}.
@@ -498,22 +485,19 @@ public class Cube {
    * @deprecated Used for debugging only.
    */
   public static boolean isEmpty(Cube cube) {
-    boolean emptyInput = false;
-    boolean emptyOutput = true;
-
-    for (InputState state : cube.input)
+    for (InputState state : cube.input) {
       if (state == EMPTY) {
-        emptyInput = true;
-        break;
+        return true;
       }
+    }
 
-    if (emptyInput) return true;
-
-    for (OutputState state : cube.output)
+    boolean emptyOutput = true;
+    for (OutputState state : cube.output) {
       if (state != NOT_OUTPUT) {
         emptyOutput = false;
         break;
       }
+    }
 
     return emptyOutput;
   }

@@ -1,7 +1,7 @@
 package espresso.minimizers;
 
 import espresso.boolFunction.Cover;
-import espresso.boolFunction.Cube;
+import espresso.boolFunction.cube.Cube;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,4 +1,6 @@
-package espresso.boolFunction;
+package espresso.boolFunction.cube;
+
+import espresso.boolFunction.Cover;
 
 import java.util.ArrayList;
 import java.util.Collection;

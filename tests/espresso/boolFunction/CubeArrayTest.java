@@ -1,9 +1,10 @@
 package espresso.boolFunction;
 
+import espresso.boolFunction.cube.Cube;
+import espresso.boolFunction.cube.CubeArray;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static espresso.boolFunction.InputState.*;
