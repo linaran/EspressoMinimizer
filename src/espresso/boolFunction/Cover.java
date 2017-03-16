@@ -259,6 +259,9 @@ public class Cover implements Iterable<Cube> {
   /**
    * Method tells whether the cover has a row full
    * of {@link InputState#DONTCARE} values.
+   * <p>
+   * Note: This is a brute force function that should be
+   * used on small {@link Cover}s only.
    *
    * @return true if it has a row full of DONTCARE values.
    */

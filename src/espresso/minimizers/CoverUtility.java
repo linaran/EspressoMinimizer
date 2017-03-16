@@ -42,7 +42,7 @@ final public class CoverUtility {
     }
 
     if (!removeContainment)
-      return Cover.of(x.copy().inputComplement()).intersect(h1).
+      return x.complement().intersect(h1).
           union(Cover.of(x).intersect(h2)).
           union(h3);
 
@@ -62,7 +62,7 @@ final public class CoverUtility {
       }
     }
 
-    return Cover.of(x.copy().inputComplement()).intersect(h1).
+    return x.complement().intersect(h1).
         union(Cover.of(x).intersect(h2)).
         union(h3);
   }

@@ -15,7 +15,7 @@ public class UnateOperations {
 
   public static Cover unateComplement(Cover cover) {
     if (!cover.isUnate())
-      throw new UnsupportedOperationException("Can't perform unate inputComplement on non unate covers.");
+      throw new UnsupportedOperationException("Can't perform unate complement on non unate covers.");
 
     inputCount = cover.inputCount();
     outputCount = cover.outputCount();
@@ -34,7 +34,7 @@ public class UnateOperations {
       return retValue;
     }
 
-    int splitIndex = splittingVariable(cover);
+    int splitIndex = unateComplementBinateSelect(cover);
     Cube splittingCube = new Cube(inputCount, outputCount);
     splittingCube.setInput(ONE, splitIndex);
     Cover[] cofactors = cover.shannonCofactors(splitIndex);
@@ -54,12 +54,12 @@ public class UnateOperations {
 
     if (cover.getZeroColumnCount(splitIndex) == 0) {
       left = recursiveUnateComplement(cofactors[1]);
-      right = Cover.of(splittingCube.copy().inputComplement()).intersect(recursiveUnateComplement(cofactors[0]));
+      right = splittingCube.complement().intersect(recursiveUnateComplement(cofactors[0]));
     } else if (cover.getOneColumnCount(splitIndex) == 0) {
       left = Cover.of(splittingCube).intersect(recursiveUnateComplement(cofactors[1]));
       right = recursiveUnateComplement(cofactors[0]);
     } else {
-      throw new UnsupportedOperationException("Crap");
+      throw new UnsupportedOperationException("Call the poor programmer.");
     }
 
     return left.union(right);
@@ -67,21 +67,24 @@ public class UnateOperations {
 
   private static Cover specialCase(Cover cover) {
     Cover retValue = new Cover();
-    if (cover.size() == 0) {
-      retValue.add(new Cube(inputCount, outputCount));
-      return retValue;
-    }
 
 //    Unate cover with don't care rows are tautologies.
     if (cover.hasDONTCARERow()) {
       return retValue;
     }
 
-    if (cover.size() == 1) {
-      retValue.add(cover.iterator().next().copy().inputComplement());
+//    Function is empty so the complement is a tautology.
+    if (cover.size() == 0) {
+      retValue.add(new Cube(inputCount, outputCount));
       return retValue;
     }
 
+//    Only one cube so complement is calculated using De Morgan laws.
+    if (cover.size() == 1) {
+      return cover.get(0).complement();
+    }
+
+//    Not a special case.
     return null;
   }
 
@@ -91,7 +94,7 @@ public class UnateOperations {
    * @param cover {@link Cover}
    * @return int
    */
-  public static int splittingVariable(Cover cover) {
+  public static int unateComplementBinateSelect(Cover cover) {
     Cube cube = largestCube(cover);
     int maxSum = 0;
     int splitIndex = -1;
