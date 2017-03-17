@@ -36,16 +36,22 @@ public class Complement {
   }
 
   public static Cover singleOutputComplement(Cover f) {
-//    System.out.println(f);
+    if (f.outputCount() != 1) {
+      throw new UnsupportedOperationException(
+          "This function complements only single output functions."
+      );
+    }
 
     //region Special cases
     Cover retValue = new Cover();
 
-    if (f.hasDONTCARERow())
+    if (f.hasDONTCARERow()) {
       return retValue;
+    }
 
-    if (f.isUnate())
+    if (f.isUnate()) {
       return UnateOperations.unateComplement(f);
+    }
 
     Cube c = new Cube(f.inputCount(), f.outputCount());
     boolean cubeChanged = false;
@@ -60,7 +66,7 @@ public class Complement {
     }
 
     if (cubeChanged) {
-      retValue.add(c.copy().inputComplement());
+      retValue.addAll(c.complement());
       f = f.cofactor(c);
     }
     //endregion
@@ -73,10 +79,10 @@ public class Complement {
 
     retValue.addAll(
         CoverUtility.mergeWithContainment(
-            singleOutputComplement(cofactors[1]),
             singleOutputComplement(cofactors[0]),
+            singleOutputComplement(cofactors[1]),
             splitCube,
-            false)
+            true)
     );
 
     return retValue;
@@ -95,5 +101,9 @@ public class Complement {
     }
 
     return retValue;
+  }
+
+  private static Cover specialCase(Cover cover) {
+    return null;
   }
 }
