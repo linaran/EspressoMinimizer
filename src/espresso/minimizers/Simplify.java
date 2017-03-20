@@ -31,12 +31,9 @@ final public class Simplify implements BooleanMinimizer {
 
     Cover[] cofactors = cover.shannonCofactors(splitIndex);
 
-//    System.out.println("Split index: " + splitIndex);
-
-    Cover intersect1, intersect2;
     Cover newCover = CoverUtility.mergeWithContainment(
-        intersect1 = minimize(cofactors[0]),
-        intersect2 = minimize(cofactors[1]),
+        minimize(cofactors[0]),
+        minimize(cofactors[1]),
         splitCube,
         true
     );

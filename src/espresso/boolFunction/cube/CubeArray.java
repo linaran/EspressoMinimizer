@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class CubeArray implements Iterable<Cube> {
-  ArrayList<Cube> list;
+  private ArrayList<Cube> list;
 
   private int inputLength = 0;
   private int outputLength = 0;
@@ -19,12 +19,27 @@ public class CubeArray implements Iterable<Cube> {
    */
   private int[][] bitCount;
 
-  public CubeArray(int initialCapacity) {
-    list = new ArrayList<>(initialCapacity);
-  }
-
+  /**
+   * Initialize an empty cube array that accepts any
+   * {@link Cube}s.
+   */
   public CubeArray() {
     list = new ArrayList<>();
+  }
+
+  /**
+   * Initialize an empty cube array that accepts only
+   * {@link Cube}s with given input count and output count.
+   *
+   * @param inputCount  int
+   * @param outputCount int
+   */
+  public CubeArray(int inputCount, int outputCount) {
+    list = new ArrayList<>();
+
+    inputLength = inputCount;
+    outputLength = outputCount;
+    bitCount = new int[2][inputLength];
   }
 
   public CubeArray(Collection<? extends Cube> c) {
@@ -63,10 +78,6 @@ public class CubeArray implements Iterable<Cube> {
     }
 
     cube.setBitCount(null);
-
-    if (list.size() == 0) {
-      inputLength = outputLength = 0;
-    }
   }
 
   private void addMaintenance(Cube cube) {

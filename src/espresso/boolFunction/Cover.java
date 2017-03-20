@@ -18,8 +18,24 @@ import static espresso.boolFunction.InputState.ONE;
 public class Cover implements Iterable<Cube> {
   private CubeArray cubes;
 
+  /**
+   * Initialize a cover that accepts any {@link Cube}
+   * regardless of the input count and output count.
+   */
   public Cover() {
     cubes = new CubeArray();
+  }
+
+  /**
+   * Initialize a cover that accepts only {@link Cube}s
+   * that with a certain number of inputs and outputs.
+   * These numbers are defined in parameters.
+   *
+   * @param inputCount  int
+   * @param outputCount int
+   */
+  public Cover(int inputCount, int outputCount) {
+    cubes = new CubeArray(inputCount, outputCount);
   }
 
   public Cover(Cube... cubes) {
@@ -94,6 +110,10 @@ public class Cover implements Iterable<Cube> {
 
   public void remove(Cube cube) {
     cubes.remove(cube);
+  }
+
+  public Cube remove(int index) {
+    return cubes.remove(index);
   }
 
   public Cube get(int index) {

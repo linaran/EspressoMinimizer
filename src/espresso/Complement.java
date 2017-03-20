@@ -1,6 +1,7 @@
 package espresso;
 
 import espresso.boolFunction.Cover;
+import espresso.boolFunction.OutputState;
 import espresso.boolFunction.cube.Cube;
 import espresso.minimizers.CoverUtility;
 
@@ -11,39 +12,60 @@ import static espresso.boolFunction.InputState.ZERO;
  * Complement
  */
 public class Complement {
-  private static int fInputCount = 0;
-  private static int fOutputCount = 0;
 
-  public static Cover complement(Cover f, Cover d) {
-    if (f.size() == 0 || d.size() == 0)
-      throw new UnsupportedOperationException("One of the given covers are empty.");
-    if (f.inputCount() != d.outputCount() || f.outputCount() != d.outputCount())
-      throw new IllegalArgumentException("Given covers are not compatible. Input/output lengths are different");
+  /**
+   * Method to calculate a complement of a multiple output boolean function.
+   * Boolean function is here defined with two {@link Cover}s. First cover
+   * defines inputs for which boolean function returns true.
+   * Second cover defines inputs for which boolean function outputs either
+   * true or false, doesn't matter.
+   * <p>
+   * TODO: Needs to be tested.
+   *
+   * @param onSet       {@link Cover} for which the boolean function will output true
+   * @param dontcareSet {@link Cover} for which the boolean function will output true/false
+   * @return A {@link Cover} for which the boolean function will return false
+   */
+  public static Cover complement(Cover onSet, Cover dontcareSet) {
+    if (onSet.inputCount() != dontcareSet.inputCount() ||
+        onSet.outputCount() != dontcareSet.outputCount()) {
+      throw new IllegalArgumentException(
+          "Given covers are not compatible. Input/output lengths are different"
+      );
+    }
 
     Cover retValue = new Cover();
 
-    fInputCount = f.inputCount();
-    fOutputCount = f.outputCount();
+    for (int i = 0; i < onSet.outputCount(); i++) {
+      Cover singleOutputOnSet = extract(onSet, i);
+      Cover singleOutputDontcareSet = extract(dontcareSet, i);
 
-    for (int i = 0; i < fOutputCount; i++) {
-      Cover singleOutputF = extract(f, i);
-      Cover singleOutputD = extract(d, i);
-
-      retValue.addAll(singleOutputComplement(singleOutputF.union(singleOutputD)));
+      retValue.addAll(singleOutputComplement(singleOutputOnSet.union(singleOutputDontcareSet)));
     }
 
     return retValue;
   }
 
+  /**
+   * Fast method for calculating complement of single output {@link Cover}s.
+   * <p>
+   * Warning: Method ignores output parts and won't throw any exceptions if
+   * given a multiple output {@link Cover}. You may get results that make no sense.
+   * For complementing multiple output {@link Cover}s
+   * see {@link Complement#complement(Cover, Cover)}.
+   *
+   * @param f Single output {@link Cover}
+   * @return Complement of given {@link Cover} which is a {@link Cover}
+   */
   public static Cover singleOutputComplement(Cover f) {
-    if (f.outputCount() != 1) {
-      throw new UnsupportedOperationException(
-          "This function complements only single output functions."
-      );
-    }
-
     //region Special cases
     Cover retValue = new Cover();
+
+//    If given cover is empty then the complement is a tautology.
+    if (f.size() == 0) {
+      retValue.add(new Cube(f.inputCount(), f.outputCount()));
+      return retValue;
+    }
 
     if (f.hasDONTCARERow()) {
       return retValue;
@@ -82,28 +104,27 @@ public class Complement {
             singleOutputComplement(cofactors[0]),
             singleOutputComplement(cofactors[1]),
             splitCube,
-            true)
+            false)
     );
 
     return retValue;
   }
 
-  public static Cover extract(Cover cover, int outputIndex) {
+  private static Cover extract(Cover cover, int extractionIndex) {
+    if (extractionIndex < 0 || extractionIndex >= cover.outputCount()) {
+      throw new IllegalArgumentException("Extraction index out of bounds.");
+    }
+
     Cover retValue = new Cover();
 
     for (Cube cube : cover) {
-      Cube extraction = new Cube(fInputCount, 1); // Single output.
-
-      for (int i = 0; i < fInputCount; i++) extraction.setInput(cube.input(i), i);
-      extraction.setOutput(cube.output(outputIndex), 0);
-
-      retValue.add(extraction);
+      if (cube.getOutputState(extractionIndex) == OutputState.OUTPUT) {
+        Cube extractedCube = new Cube(cover.inputCount(), cover.outputCount(), extractionIndex);
+        extractedCube.setInput(cube);
+        retValue.add(extractedCube);
+      }
     }
 
     return retValue;
-  }
-
-  private static Cover specialCase(Cover cover) {
-    return null;
   }
 }

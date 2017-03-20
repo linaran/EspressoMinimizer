@@ -30,13 +30,17 @@ final public class CoverUtility {
 
     for (Iterator<Cube> iter1 = h1.iterator(); iter1.hasNext(); ) {
       Cube c1 = iter1.next();
+      boolean deleteDone = false;
       for (Iterator<Cube> iter2 = h2.iterator(); iter2.hasNext(); ) {
         Cube c2 = iter2.next();
 
         if (c1.equals(c2)) {
-          iter1.remove();
+          if (!deleteDone) {
+            iter1.remove();
+            deleteDone = true;
+          }
           iter2.remove();
-          h3.add(c1);
+          h3.add(c2);
         }
       }
     }

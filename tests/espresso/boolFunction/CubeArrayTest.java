@@ -121,8 +121,8 @@ public class CubeArrayTest {
     cubes.add(wrongCube);
   }
 
-  @Test
-  public void emptyCubeArrayShouldAcceptAnyCubeIteratorCase() throws Exception {
+  @Test(expected = IllegalArgumentException.class)
+  public void emptyCubeArrayShouldNotAcceptAnyCubeIteratorCase() throws Exception {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
@@ -144,8 +144,8 @@ public class CubeArrayTest {
     cubes.add(wrongCube);
   }
 
-  @Test
-  public void emptyCubeArrayShouldAcceptAnyCubeRemoveCase() throws Exception {
+  @Test(expected = IllegalArgumentException.class)
+  public void emptyCubeArrayShouldNotAcceptAnyCubeRemoveCase() throws Exception {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
     CubeArray cubes = new CubeArray();
 

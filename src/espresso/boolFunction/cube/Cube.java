@@ -29,20 +29,6 @@ public class Cube {
   private int[][] bitCount = null;
 
   /**
-   * See {@link #Cube(int, int)}.
-   *
-   * @param inputCount  primitive int.
-   * @param outputCount primitive int.
-   */
-  private void totalUniverseInit(int inputCount, int outputCount) {
-    input = new InputState[inputCount];
-    output = new OutputState[outputCount];
-
-    for (int i = 0; i < inputCount; i++) setInput(DONTCARE, i);
-    for (int i = 0; i < outputCount; i++) output[i] = OUTPUT;
-  }
-
-  /**
    * Creates a cube with the given number of input variables
    * and the given number of output variables. Cube is initialized
    * to be a total universal cube (all inputs are in {@link InputState#DONTCARE}
@@ -52,7 +38,33 @@ public class Cube {
    * @param outputCount primitive int.
    */
   public Cube(int inputCount, int outputCount) {
-    totalUniverseInit(inputCount, outputCount);
+    input = new InputState[inputCount];
+    output = new OutputState[outputCount];
+
+    for (int i = 0; i < inputCount; i++) setInput(DONTCARE, i);
+    for (int i = 0; i < outputCount; i++) output[i] = OUTPUT;
+  }
+
+  /**
+   * Constructor for creating a tautology (all inputs are {@link InputState#DONTCARE})
+   * cube for only one output. Other outputs aren't used.
+   *
+   * @param inputCount  int, number of inputs for the new cube
+   * @param outputCount int, number of outputs for the new cube
+   * @param outputIndex int, choice of output to use
+   */
+  public Cube(int inputCount, int outputCount, int outputIndex) {
+    if (outputIndex < 0 || outputIndex >= outputCount) {
+      throw new IllegalArgumentException("Given output index is out of range.");
+    }
+
+    input = new InputState[inputCount];
+    output = new OutputState[outputCount];
+
+    for (int i = 0; i < inputCount; i++) setInput(DONTCARE, i);
+    for (int i = 0; i < outputCount; i++) {
+      output[i] = (i == outputIndex) ? OUTPUT : NOT_OUTPUT;
+    }
   }
 
   /**
@@ -181,6 +193,14 @@ public class Cube {
     return output[i];
   }
 
+  public InputState getInputState(int index) {
+    return input[index];
+  }
+
+  public OutputState getOutputState(int index) {
+    return output[index];
+  }
+
   public void setInput(InputState inputState, int i) {
     if (bitCount != null) {
       int newState = inputState.valueOf();
@@ -194,8 +214,48 @@ public class Cube {
     input[i] = inputState; // okay
   }
 
+  public void setInput(InputState[] inputStates) {
+    if (inputStates.length != input.length) {
+      throw new IllegalArgumentException("Incompatible length of input argument.");
+    }
+
+    for (int i = 0; i < input.length; ++i) {
+      setInput(inputStates[i], i);
+    }
+  }
+
+  public void setInput(Cube cube) {
+    if (cube.inputLength() != input.length) {
+      throw new IllegalArgumentException("Incompatible length of input argument.");
+    }
+
+    for (int i = 0; i < input.length; ++i) {
+      setInput(cube.getInputState(i), i);
+    }
+  }
+
   public void setOutput(OutputState outputState, int i) {
     output[i] = outputState;
+  }
+
+  public void setOutput(OutputState[] outputStates) {
+    if (outputStates.length != output.length) {
+      throw new IllegalArgumentException("Incompatible length of output argument.");
+    }
+
+    for (int i = 0; i < output.length; ++i) {
+      setOutput(outputStates[i], i);
+    }
+  }
+
+  public void setOutput(Cube cube) {
+    if (cube.outputLength() != output.length) {
+      throw new IllegalArgumentException("Incompatible length of output argument.");
+    }
+
+    for (int i = 0; i < output.length; ++i) {
+      setOutput(cube.getOutputState(i), i);
+    }
   }
 
   public int inputLength() {
