@@ -1,4 +1,4 @@
-package espresso;
+package espresso.minimizers.espressoMinimizer;
 
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.cube.Cube;
