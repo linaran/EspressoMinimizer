@@ -7,7 +7,7 @@ import static espresso.boolFunction.InputState.DONTCARE;
 
 public class Tautology {
 
-  public boolean singleOutputTautologyCheck(Cover cover) {
+  public static boolean singleOutputTautologyCheck(Cover cover) {
     Boolean specialCaseCheck = specialCase(cover);
     if (specialCaseCheck != null) {
       return specialCaseCheck;
@@ -34,7 +34,7 @@ public class Tautology {
    * @return {@link Boolean}, true if it is tautology, false if it isn't
    * null if it couldn't tell.
    */
-  private Boolean specialCase(Cover cover) {
+  private static Boolean specialCase(Cover cover) {
     if (cover.hasDONTCARERow()) {
       return true;
     }
@@ -61,14 +61,14 @@ public class Tautology {
     return null;
   }
 
-  private double mintermCountUpperBound(Cover cover) {
+  private static double mintermCountUpperBound(Cover cover) {
     double retValue = 0;
 
     for (Cube cube : cover) {
       int dontcareCount = 0;
 
       for (int i = 0; i < cube.inputLength(); ++i) {
-        if (cube.getInputState(0) == DONTCARE) {
+        if (cube.getInputState(i) == DONTCARE) {
           ++dontcareCount;
         }
       }
