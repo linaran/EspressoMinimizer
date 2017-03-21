@@ -66,7 +66,7 @@ public class UnateOperations {
   }
 
   private static Cover specialCase(Cover cover) {
-    Cover retValue = new Cover();
+    Cover retValue = new Cover(cover.inputCount(), cover.outputCount());
 
 //    Unate cover with don't care rows are tautologies.
     if (cover.hasDONTCARERow()) {

@@ -18,7 +18,7 @@ public class CubeArrayTest {
   @Test
   public void addMethodShouldIncreaseBitColumnCount() {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, ONE}, new OutputState[]{OUTPUT});
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.add(cube1);
 
     assertTrue(
@@ -38,7 +38,7 @@ public class CubeArrayTest {
   @Test
   public void removeMethodShouldLowerBitColumnCount() {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, ONE}, new OutputState[]{OUTPUT});
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.add(cube1);
     cubes.remove(cube1);
 
@@ -56,7 +56,7 @@ public class CubeArrayTest {
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
 
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.addAll(Arrays.asList(cube1, cube2, cube3));
 
     int[] oneColumnCount = new int[cubes.getInputLength()];
@@ -86,7 +86,7 @@ public class CubeArrayTest {
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
 
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.addAll(Arrays.asList(cube1, cube2, cube3));
 
     for (Iterator<Cube> iterator = cubes.iterator(); iterator.hasNext(); ) {
@@ -114,7 +114,7 @@ public class CubeArrayTest {
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
 
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.addAll(Arrays.asList(cube1, cube2, cube3));
 
     Cube wrongCube = new Cube(new InputState[]{ONE}, new OutputState[]{OUTPUT});
@@ -127,7 +127,7 @@ public class CubeArrayTest {
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE}, new OutputState[]{OUTPUT});
     Cube cube3 = new Cube(new InputState[]{DONTCARE, ONE, ONE}, new OutputState[]{OUTPUT});
 
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
     cubes.addAll(Arrays.asList(cube1, cube2, cube3));
 
     for (Iterator<Cube> iterator = cubes.iterator(); iterator.hasNext(); ) {
@@ -147,7 +147,7 @@ public class CubeArrayTest {
   @Test(expected = IllegalArgumentException.class)
   public void emptyCubeArrayShouldNotAcceptAnyCubeRemoveCase() throws Exception {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
-    CubeArray cubes = new CubeArray();
+    CubeArray cubes = new CubeArray(3, 1);
 
     cubes.add(cube1);
     cubes.remove(cube1);

@@ -2,6 +2,7 @@ package espresso.boolFunction;
 
 import espresso.boolFunction.cube.Cube;
 import espresso.boolFunction.cube.CubeArray;
+import espresso.minimizers.espressoMinimizer.Complement;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,14 +20,6 @@ public class Cover implements Iterable<Cube> {
   private CubeArray cubes;
 
   /**
-   * Initialize a cover that accepts any {@link Cube}
-   * regardless of the input count and output count.
-   */
-  public Cover() {
-    cubes = new CubeArray();
-  }
-
-  /**
    * Initialize a cover that accepts only {@link Cube}s
    * that with a certain number of inputs and outputs.
    * These numbers are defined in parameters.
@@ -41,7 +34,7 @@ public class Cover implements Iterable<Cube> {
   public Cover(Cube... cubes) {
     if (cubes == null) throw new NullPointerException("Parameter can't be null.");
 
-    this.cubes = new CubeArray();
+    this.cubes = new CubeArray(cubes[0].inputLength(), cubes[0].outputLength());
 
     for (Cube cube : cubes) {
       this.cubes.add(cube);
@@ -64,19 +57,31 @@ public class Cover implements Iterable<Cube> {
    * @param splitChar {@link String}
    * @throws IOException If file not found or some other IO error occurs.
    */
-  public Cover(String filepath, String splitChar) throws IOException {
-    cubes = new CubeArray();
-
+  public Cover(String filepath) throws IOException {
     try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
-      for (String line = br.readLine(); line != null; line = br.readLine()) {
-        String[] split = line.split(splitChar);
-        InputState[] inputStates = new InputState[split.length];
+      String firstLine = br.readLine();
+      String[] inputOutputCounts = firstLine.split("\\s+");
+      int inputCount = Integer.valueOf(inputOutputCounts[0]);
+      int outputCount = Integer.valueOf(inputOutputCounts[1]);
 
-        for (int i = 0; i < split.length; ++i) {
-          inputStates[i] = InputState.values()[Integer.valueOf(split[i])];
+      cubes = new CubeArray(inputCount, outputCount);
+
+      for (String line = br.readLine(); line != null; line = br.readLine()) {
+        String[] inputOutputStrings = line.split("\\s+");
+        String inputString = inputOutputStrings[0];
+        String outputString = inputOutputStrings[1];
+
+        InputState[] inputStates = new InputState[inputString.length()];
+        for (int i = 0; i < inputStates.length; ++i) {
+          inputStates[i] = InputState.fromValue(Character.getNumericValue(inputString.charAt(i)));
         }
 
-        cubes.add(new Cube(inputStates, new OutputState[]{OutputState.OUTPUT}));
+        OutputState[] outputStates = new OutputState[outputString.length()];
+        for (int i = 0; i < outputStates.length; ++i) {
+          outputStates[i] = OutputState.fromValue(Character.getNumericValue(outputString.charAt(i)));
+        }
+
+        cubes.add(new Cube(inputStates, outputStates));
       }
     }
   }
@@ -97,6 +102,35 @@ public class Cover implements Iterable<Cube> {
       retValue += cube.toString() + "\n";
     }
     if (retValue.equals("")) return "empty\n";
+    return retValue;
+  }
+
+  private void checkCoverCompatibility(Cover other) {
+    if (inputCount() != other.inputCount() || outputCount() != other.outputCount()) {
+      throw new UnsupportedOperationException(
+          "This operation can't be performed on these two covers. Their input or output counts are different."
+      );
+    }
+  }
+
+  /**
+   * Method creates a variable {@link Cube} for this cover.
+   * A variable {@link Cube} has all {@link InputState#DONTCARE}
+   * input states except for one {@link InputState#ONE} state located
+   * at the given index. All output states are {@link OutputState#OUTPUT}.
+   *
+   * @param inputIndex int
+   * @return {@link Cube}
+   * @see Cube
+   */
+  public Cube generateVariableCube(int inputIndex) {
+    if (inputIndex < 0 || inputIndex >= inputCount()) {
+      throw new IllegalArgumentException("Input index is out of range for this cover.");
+    }
+
+    Cube retValue = new Cube(inputCount(), outputCount());
+    retValue.setInput(ONE, inputIndex);
+
     return retValue;
   }
 
@@ -155,10 +189,6 @@ public class Cover implements Iterable<Cube> {
     return cubes.getZeroColumnCount(i);
   }
 
-//////////////////////////////////////////////////////////////////////////////
-//  Espresso operations
-//////////////////////////////////////////////////////////////////////////////
-
   /**
    * The method tells if this cover is unate.
    * A cover is unate if it contains a column that doesn't have
@@ -216,10 +246,6 @@ public class Cover implements Iterable<Cube> {
     return maxIndex;
   }
 
-//////////////////////////////////////////////////////////////////////////////
-//  Cover operations
-//////////////////////////////////////////////////////////////////////////////
-
   /**
    * Method returns the Shannon expansion of this cover with
    * regard to the column which is denoted by the split index.
@@ -232,15 +258,11 @@ public class Cover implements Iterable<Cube> {
    * @return array of two {@link Cover}s.
    */
   public Cover[] shannonCofactors(int splitIndex) {
-    if (splitIndex < 0 || splitIndex >= inputCount()) {
-      throw new IllegalArgumentException("Split index is out range for input size of this cover.");
-    }
     if (cubes.size() == 0) {
       throw new UnsupportedOperationException("Cube is empty!");
     }
 
-    Cube splitCube = new Cube(inputCount(), outputCount());
-    splitCube.setInput(ONE, splitIndex);
+    Cube splitCube = generateVariableCube(splitIndex);
     Cube complement = new Cube(splitCube).inputComplement();
 
     Cover[] retValue = new Cover[2];
@@ -262,10 +284,8 @@ public class Cover implements Iterable<Cube> {
    * @return {@link Cover}.
    */
   public Cover cofactor(Cube other) {
-    if (cubes.size() == 0)
-      throw new UnsupportedOperationException("Cube is empty!");
-
-    Cover retValue = new Cover();
+    checkCoverCompatibility(Cover.of(other));
+    Cover retValue = new Cover(inputCount(), outputCount());
 
     for (Cube cube : cubes) {
       Cube cubeCofactor = cube.cofactor(other);
@@ -298,33 +318,18 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Complements the cover. In place transformation.<br/>
-   * Note: Cover inputComplement is just {@link Cube} output part inputComplement.
+   * Returns a complement of this cover.
    *
-   * @deprecated Although it works it is inefficient.
+   * @return {@link Cover}
+   * @see Complement#singleOutputComplement(Cover)
+   * @see Complement#complement(Cover, Cover)
    */
-  public void complement() {
-    if (cubes.size() == 0)
-      throw new UnsupportedOperationException("Cube is empty!");
-
-    cubes.forEach(Cube::outputComplement);
-  }
-
-  /**
-   * Returns a new cover which is a complemented representation
-   * of the given parameter.
-   *
-   * @param cover {@link Cover}.
-   * @return {@link Cover}.
-   * @deprecated Looks useless and wrong. At least time complexity is too big.
-   */
-  public Cover complement(Cover cover) {
-    if (cubes.size() == 0)
-      throw new UnsupportedOperationException("Cube is empty!");
-
-    Cover retValue = new Cover(cover);
-    retValue.complement();
-    return retValue;
+  public Cover complement() {
+    if (outputCount() == 1) {
+      return Complement.singleOutputComplement(this);
+    } else {
+      return Complement.complement(this, new Cover(inputCount(), outputCount()));
+    }
   }
 
   /**
@@ -336,7 +341,8 @@ public class Cover implements Iterable<Cube> {
    * @return {@link Cover}.
    */
   public Cover intersect(Cover other) {
-    Cover retValue = new Cover();
+    checkCoverCompatibility(other);
+    Cover retValue = new Cover(inputCount(), outputCount());
 
     for (Cube cube1 : cubes) {
       for (Cube cube2 : other.cubes) {
@@ -357,32 +363,13 @@ public class Cover implements Iterable<Cube> {
    * @return {@link Cover}.
    */
   public Cover union(Cover other) {
-//    TODO: It is unclear how this method should be implemented. At least make a union of ON-SETS.
-//    TODO: A more compact union implementation is possible.
-    Cover retValue = new Cover();
+    checkCoverCompatibility(other);
+    Cover retValue = new Cover(inputCount(), outputCount());
 
     retValue.cubes.addAll(cubes);
     retValue.cubes.addAll(other.cubes);
 
     return retValue;
-  }
-
-  /**
-   * Difference between cover <b>A</b> and cover <b>B</b> is a set of cubes (cover)
-   * that covers<br/>
-   * <br/>
-   * "<b>A</b> INTERSECT COMPLEMENT(<b>B</b>)".<br/>
-   * <br/>
-   * Method returns the difference between this cover and
-   * the other cover (given parameter).<br/>
-   * Note: There is a big difference between a.difference(b) and b.difference(a)!
-   *
-   * @param other {@link Cover}.
-   * @return {@link Cover}.
-   * @deprecated Using useless and wrong inputComplement function.
-   */
-  public Cover difference(Cover other) {
-    return intersect(complement(other));
   }
 
   /**
@@ -405,6 +392,10 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Use for debug purposes only and use it on small covers.
+   * <p>
+   * Warning: This method doesn't check if two covers are
+   * logically equivalent. It checks if the covers have
+   * same {@link Cube}s.
    *
    * @param obj {@link Object}
    * @return true if equal otherwise false.

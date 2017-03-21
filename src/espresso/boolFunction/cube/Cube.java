@@ -408,7 +408,7 @@ public class Cube {
    * @return {@link Cover}
    */
   public Cover complement() {
-    Cover retValue = new Cover();
+    Cover retValue = new Cover(inputLength(), outputLength());
 
     for (int i = 0; i < input.length; ++i) {
       InputState literal = input[i];

@@ -19,14 +19,14 @@ final public class CoverUtility {
    *
    * @param h1                {@link Cover} subcover obtained by the Shannon expansion.
    * @param h2                {@link Cover} subcover obtained by the Shannon expansion.
-   * @param x                 Shannon expansion was done with respect to this {@link Cube}.
+   * @param splitIndex        Shannon expansion was done with respect to this {@link Cube}.
    *                          Note that this parameter is copied. Given reference is not used.
    * @param removeContainment if false then this method becomes mergeWithIdentity.
    * @return {@link Cover} before performing Shannon expansion on it.
    */
-  public static Cover mergeWithContainment(Cover h1, Cover h2, Cube x, boolean removeContainment) {
-    Cover h3 = new Cover();
-    x = x.copy();
+  public static Cover mergeWithContainment(Cover h1, Cover h2, int splitIndex, boolean removeContainment) {
+    Cover h3 = new Cover(h1.inputCount(), h1.outputCount());
+    Cube x = h1.generateVariableCube(splitIndex);
 
     for (Iterator<Cube> iter1 = h1.iterator(); iter1.hasNext(); ) {
       Cube c1 = iter1.next();

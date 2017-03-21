@@ -34,7 +34,7 @@ public class Complement {
       );
     }
 
-    Cover retValue = new Cover();
+    Cover retValue = new Cover(onSet.inputCount(), onSet.outputCount());
 
     for (int i = 0; i < onSet.outputCount(); i++) {
       Cover singleOutputOnSet = extract(onSet, i);
@@ -59,7 +59,7 @@ public class Complement {
    */
   public static Cover singleOutputComplement(Cover f) {
     //region Special cases
-    Cover retValue = new Cover();
+    Cover retValue = new Cover(f.inputCount(), f.outputCount());
 
 //    If given cover is empty then the complement is a tautology.
     if (f.size() == 0) {
@@ -94,16 +94,13 @@ public class Complement {
     //endregion
 
     int splitIndex = f.binateSelect();
-    Cube splitCube = new Cube(f.inputCount(), f.outputCount());
-    splitCube.setInput(ONE, splitIndex);
-
     Cover[] cofactors = f.shannonCofactors(splitIndex);
 
     retValue.addAll(
         CoverUtility.mergeWithContainment(
             singleOutputComplement(cofactors[0]),
             singleOutputComplement(cofactors[1]),
-            splitCube,
+            splitIndex,
             false)
     );
 
@@ -115,7 +112,7 @@ public class Complement {
       throw new IllegalArgumentException("Extraction index out of bounds.");
     }
 
-    Cover retValue = new Cover();
+    Cover retValue = new Cover(cover.inputCount(), cover.outputCount());
 
     for (Cube cube : cover) {
       if (cube.getOutputState(extractionIndex) == OutputState.OUTPUT) {

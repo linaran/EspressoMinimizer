@@ -26,15 +26,12 @@ final public class Simplify implements BooleanMinimizer {
     }
 
     int splitIndex = cover.binateSelect();
-    Cube splitCube = new Cube(cover.inputCount(), cover.outputCount());
-    splitCube.setInput(ONE, splitIndex);
-
     Cover[] cofactors = cover.shannonCofactors(splitIndex);
 
     Cover newCover = CoverUtility.mergeWithContainment(
         minimize(cofactors[0]),
         minimize(cofactors[1]),
-        splitCube,
+        splitIndex,
         true
     );
 

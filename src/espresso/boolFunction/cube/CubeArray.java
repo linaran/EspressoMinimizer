@@ -9,8 +9,8 @@ import java.util.Iterator;
 public class CubeArray implements Iterable<Cube> {
   private ArrayList<Cube> list;
 
-  private int inputLength = 0;
-  private int outputLength = 0;
+  private int inputLength;
+  private int outputLength;
 
   /**
    * This reference is shared among all {@link Cube}s contained in this data structure.
@@ -19,12 +19,10 @@ public class CubeArray implements Iterable<Cube> {
    */
   private int[][] bitCount;
 
-  /**
-   * Initialize an empty cube array that accepts any
-   * {@link Cube}s.
-   */
-  public CubeArray() {
-    list = new ArrayList<>();
+  private void initialize(int inputCount, int outputCount) {
+    inputLength = inputCount;
+    outputLength = outputCount;
+    bitCount = new int[2][inputLength];
   }
 
   /**
@@ -36,14 +34,7 @@ public class CubeArray implements Iterable<Cube> {
    */
   public CubeArray(int inputCount, int outputCount) {
     list = new ArrayList<>();
-
-    inputLength = inputCount;
-    outputLength = outputCount;
-    bitCount = new int[2][inputLength];
-  }
-
-  public CubeArray(Collection<? extends Cube> c) {
-    list = new ArrayList<>(c);
+    initialize(inputCount, outputCount);
   }
 
   /**
@@ -53,10 +44,16 @@ public class CubeArray implements Iterable<Cube> {
    */
   public CubeArray(CubeArray cubeArray) {
     list = new ArrayList<>();
+    initialize(cubeArray.inputLength, cubeArray.outputLength);
     addAll(cubeArray);
   }
 
   private void validateCube(Cube cube) {
+    if (cube.isBitCountTaken()) {
+      throw new IllegalArgumentException(
+          "This cube already belongs to a CubeArray or Cover. Copy it."
+      );
+    }
     if (inputLength != cube.inputLength() || outputLength != cube.outputLength()) {
       throw new IllegalArgumentException(
           "Given cube must have the same number of inputs and outputs as the cubes in the set."
@@ -64,29 +61,7 @@ public class CubeArray implements Iterable<Cube> {
     }
   }
 
-  private void initializeData(Cube cube) {
-    inputLength = cube.inputLength();
-    outputLength = cube.outputLength();
-    bitCount = new int[2][inputLength];
-  }
-
-  private void removeMaintenance(Cube cube) {
-    for (int i = 0; i < inputLength; i++) {
-      int oldState = cube.input(i).valueOf();
-      if (oldState < 2)
-        bitCount[oldState][i]--;
-    }
-
-    cube.setBitCount(null);
-  }
-
-  private void addMaintenance(Cube cube) {
-    if (inputLength != 0 && outputLength != 0) {
-      validateCube(cube);
-    } else {
-      initializeData(cube);
-    }
-
+  private void increaseCounters(Cube cube) {
     for (int i = 0; i < inputLength; i++) {
       int newState = cube.input(i).valueOf();
       if (newState < 2)
@@ -94,6 +69,16 @@ public class CubeArray implements Iterable<Cube> {
     }
 
     cube.setBitCount(bitCount);
+  }
+
+  private void decreaseCounters(Cube cube) {
+    for (int i = 0; i < inputLength; i++) {
+      int oldState = cube.input(i).valueOf();
+      if (oldState < 2)
+        bitCount[oldState][i]--;
+    }
+
+    cube.setBitCount(null);
   }
 
   public int size() {
@@ -132,14 +117,9 @@ public class CubeArray implements Iterable<Cube> {
       return;
     }
 
-    if (cube.isBitCountTaken()) {
-      throw new IllegalArgumentException(
-          "This cube already belongs to a CubeArray or Cover. Copy it."
-      );
-    }
-
+    validateCube(cube);
     if (list.add(cube)) {
-      addMaintenance(cube);
+      increaseCounters(cube);
     }
   }
 
@@ -172,20 +152,21 @@ public class CubeArray implements Iterable<Cube> {
       );
     }
 
-    addMaintenance(cube);
+    validateCube(cube);
     list.add(index, cube);
+    increaseCounters(cube);
   }
 
   public Cube remove(int index) {
     Cube cube = list.get(index);
-    removeMaintenance(cube);
+    decreaseCounters(cube);
     return list.remove(index);
   }
 
   public void remove(Object o) {
     Cube cube = (Cube) o;
     if (list.remove(o)) {
-      removeMaintenance(cube);
+      decreaseCounters(cube);
     }
   }
 
@@ -215,7 +196,7 @@ public class CubeArray implements Iterable<Cube> {
 
     public void remove() {
       iterator.remove();
-      CubeArray.this.removeMaintenance(currentCube);
+      CubeArray.this.decreaseCounters(currentCube);
     }
   }
 }

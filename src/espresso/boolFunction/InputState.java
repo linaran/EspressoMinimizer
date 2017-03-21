@@ -29,6 +29,31 @@ public enum InputState {
     return numState;
   }
 
+  /**
+   * Returns an InputState for a given int value.
+   * Integer to InputState mappings are: ZERO(0),
+   * ONE(1), DONTCARE(2), EMPTY(5).
+   *
+   * @param value int
+   * @return {@link InputState}
+   */
+  public static InputState fromValue(int value) {
+    switch (value) {
+      case 0:
+        return ZERO;
+      case 1:
+        return ONE;
+      case 2:
+        return DONTCARE;
+      case 5:
+        return EMPTY;
+      default:
+        throw new IllegalArgumentException(
+            "Accepted values are 0, 1, 2, 5."
+        );
+    }
+  }
+
   public static InputState and(InputState o1, InputState o2) {
     if (o1 == EMPTY || o2 == EMPTY)
       throw new IllegalArgumentException("One of the input states are empty.");

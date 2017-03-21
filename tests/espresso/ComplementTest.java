@@ -10,9 +10,9 @@ public class ComplementTest {
 
   @Test
   public void singleOutputComplement() throws Exception {
-    Cover c1 = new Cover("testCase1.txt", " ");
-    Cover c2 = new Cover("testCase2.txt", " ");
-    Cover c3 = new Cover("testCase3.txt", " ");
+    Cover c1 = new Cover("testCase1.txt");
+    Cover c2 = new Cover("testCase2.txt");
+    Cover c3 = new Cover("testCase3.txt");
     Cover[] testArray = new Cover[]{c1, c2, c3};
 
     for (Cover c : testArray) {

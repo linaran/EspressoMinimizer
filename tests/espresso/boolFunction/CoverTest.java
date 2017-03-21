@@ -14,7 +14,7 @@ public class CoverTest {
   @Test
   public void addMethodShouldIncreaseBitColumnCount() {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, ONE}, new OutputState[]{OUTPUT});
-    Cover cubes = new Cover();
+    Cover cubes = new Cover(3, 1);
     cubes.add(cube1);
 
     assertTrue(
@@ -34,7 +34,7 @@ public class CoverTest {
   @Test
   public void removeMethodShouldLowerBitColumnCount() {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, ONE}, new OutputState[]{OUTPUT});
-    Cover cubes = new Cover();
+    Cover cubes = new Cover(3, 1);
     cubes.add(cube1);
     cubes.remove(cube1);
 
