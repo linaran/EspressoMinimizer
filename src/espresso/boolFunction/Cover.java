@@ -2,7 +2,7 @@ package espresso.boolFunction;
 
 import espresso.boolFunction.cube.Cube;
 import espresso.boolFunction.cube.CubeArray;
-import espresso.minimizers.espressoMinimizer.Complement;
+import espresso.urpAlgorithms.Complement;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

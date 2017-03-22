@@ -1,4 +1,4 @@
-package espresso.minimizers.espressoMinimizer;
+package espresso.urpAlgorithms;
 
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.OutputState;

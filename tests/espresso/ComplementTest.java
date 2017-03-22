@@ -1,7 +1,7 @@
 package espresso;
 
 import espresso.boolFunction.Cover;
-import espresso.minimizers.espressoMinimizer.Complement;
+import espresso.urpAlgorithms.Complement;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
