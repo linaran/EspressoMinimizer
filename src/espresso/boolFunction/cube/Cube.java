@@ -290,6 +290,30 @@ public class Cube {
 //////////////////////////////////////////////////////////////////////////////
 
   /**
+   * Expand this cube so into a {@link Cover} where each
+   * cube has only one {@link OutputState#OUTPUT}.
+   * <p>
+   * If this cube has two {@link OutputState#OUTPUT}s in its
+   * output part then this method will return a {@link Cover}
+   * with two cubes.
+   *
+   * @return {@link Cover}
+   */
+  public Cover unwrap() {
+    Cover retValue = new Cover(input.length, output.length);
+
+    for (int i = 0; i < output.length; i++) {
+      if (output[i] == OUTPUT) {
+        Cube cube = new Cube(input.length, output.length, i);
+        cube.setInput(input);
+        retValue.add(cube);
+      }
+    }
+
+    return retValue;
+  }
+
+  /**
    * Method returns a new cube that represents an intersection
    * between this cube and another cube (given parameter).<br/>
    * Note: This operation can produce an {@link InputState#EMPTY} cube.

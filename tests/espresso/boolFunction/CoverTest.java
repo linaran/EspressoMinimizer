@@ -10,7 +10,31 @@ import static espresso.boolFunction.OutputState.*;
 import static org.junit.Assert.*;
 
 
+// TODO: There are tests that don't use Cover#equals method.
 public class CoverTest {
+
+  @Test
+  public void unwrap() throws Exception {
+    Cover cover = new Cover(
+        new Cube(new InputState[]{ONE, ZERO}, new OutputState[]{OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ZERO, ONE}, new OutputState[]{NOT_OUTPUT, OUTPUT})
+    );
+
+    Cover expectedCover = new Cover(
+        new Cube(new InputState[]{ONE, ZERO}, new OutputState[]{OUTPUT, NOT_OUTPUT}),
+        new Cube(new InputState[]{ONE, ZERO}, new OutputState[]{NOT_OUTPUT, OUTPUT}),
+        new Cube(new InputState[]{ZERO, ONE}, new OutputState[]{NOT_OUTPUT, OUTPUT})
+    );
+
+    Cover actualCover = cover.unwrap();
+
+    assertEquals(
+        "There is a bug in the Cover#unwrap method.",
+        expectedCover,
+        actualCover
+    );
+  }
+
   @Test
   public void addMethodShouldIncreaseBitColumnCount() {
     Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, ONE}, new OutputState[]{OUTPUT});

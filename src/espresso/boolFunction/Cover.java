@@ -33,6 +33,11 @@ public class Cover implements Iterable<Cube> {
 
   public Cover(Cube... cubes) {
     if (cubes == null) throw new NullPointerException("Parameter can't be null.");
+    if (cubes.length == 0) {
+      throw new IllegalArgumentException(
+          "At least one cube is needed for this constructor. See Cover#Cover(int, int) as an alternative."
+      );
+    }
 
     this.cubes = new CubeArray(cubes[0].inputLength(), cubes[0].outputLength());
 
@@ -187,6 +192,27 @@ public class Cover implements Iterable<Cube> {
 
   public int getZeroColumnCount(int i) {
     return cubes.getZeroColumnCount(i);
+  }
+
+  /**
+   * This method returns a new cover which is equivalent
+   * to the current cover but the new cover will contain
+   * {@link Cube}s that have only one {@link OutputState#OUTPUT}
+   * in their output part.
+   * <p>
+   * Warning: The new cover may be very large.
+   *
+   * @return {@link Cover}
+   */
+  public Cover unwrap() {
+    Cover retValue = new Cover(inputCount(), outputCount());
+
+    for (Cube cube : this) {
+      Cover unwrappedCube = cube.unwrap();
+      retValue.addAll(unwrappedCube);
+    }
+
+    return retValue;
   }
 
   /**
