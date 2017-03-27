@@ -285,9 +285,6 @@ public class Cube {
   boolean isBitCountTaken() {
     return bitCount != null;
   }
-  //////////////////////////////////////////////////////////////////////////////
-//  Cube operations
-//////////////////////////////////////////////////////////////////////////////
 
   /**
    * Expand this cube so into a {@link Cover} where each
@@ -562,11 +559,8 @@ public class Cube {
    * A {@link Cube} is regarded empty when one of the input parts
    * is {@link InputState#EMPTY} or all of the output parts are {@link OutputState#NOT_OUTPUT}.
    * In a majority of cases an empty cube should be deleted from the {@link Cover}.<br/>
-   * <b>Warning:</b> This method is not an efficient check for emptiness. The best way to do
-   * this is to check for emptiness on entries that have been recently changed.
    *
    * @return true if the cube is empty, false otherwise.
-   * @deprecated Used for debugging only.
    */
   public static boolean isEmpty(Cube cube) {
     for (InputState state : cube.input) {

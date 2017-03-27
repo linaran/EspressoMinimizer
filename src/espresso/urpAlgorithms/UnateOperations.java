@@ -6,7 +6,7 @@ import espresso.boolFunction.cube.Cube;
 import static espresso.boolFunction.InputState.DONTCARE;
 import static espresso.boolFunction.InputState.ONE;
 
-public class UnateOperations {
+final public class UnateOperations {
   private static int inputCount = 0;
   private static int outputCount = 0;
 

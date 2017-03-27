@@ -399,14 +399,13 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Function to be used in {@link Cover#equals(Object)}.
    * Tells if this cover contains a cube that is LITERALLY
    * identical to the given {@link Cube}.
    *
    * @param cube {@link Cube}
    * @return true if the cube is found
    */
-  private boolean containsCube(Cube cube) {
+  public boolean hasCube(Cube cube) {
     for (Cube c : this) {
       if (c.equals(cube)) {
         return true;
@@ -439,7 +438,7 @@ public class Cover implements Iterable<Cube> {
     }
 
     for (Cube cube : this) {
-      if (!other.containsCube(cube)) {
+      if (!other.hasCube(cube)) {
         return false;
       }
     }

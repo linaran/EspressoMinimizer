@@ -5,7 +5,7 @@ import espresso.boolFunction.cube.Cube;
 
 import static espresso.boolFunction.InputState.DONTCARE;
 
-public class Tautology {
+final public class Tautology {
 
   public static boolean singleOutputTautologyCheck(Cover cover) {
     Boolean specialCaseCheck = specialCase(cover);

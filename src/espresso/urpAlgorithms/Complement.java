@@ -11,7 +11,7 @@ import static espresso.boolFunction.InputState.ZERO;
 /**
  * Complement
  */
-public class Complement {
+final public class Complement {
 
   /**
    * Method to calculate a complement of a multiple output boolean function.
