@@ -2,7 +2,7 @@ package espresso;
 
 /**
  * Simple class to return two different objects in some methods.
- * Don't put this into first collection.
+ * Don't put this into collections.
  */
 public class Pair<A, B> {
   public final A first;

@@ -15,31 +15,38 @@ final public class Expand {
   private static HashSet<Integer> removedBlockRows = new HashSet<>();
   private static HashSet<Integer> removedColumns = new HashSet<>();
 
+  private static void clearStatic() {
+    loweringSet.clear();
+    raisingSet.clear();
+
+    removedCoverRows.clear();
+    removedBlockRows.clear();
+    removedColumns.clear();
+  }
+
   private Expand() {
   }
 
   public static Cover expandCover(Cover onSet, Cover offSet) {
-    Cover expandedCover = new Cover(onSet);
-    expandedCover.sort(new CubeSizeComparator());
+    Cover retValue = new Cover(onSet.inputCount(), onSet.outputCount());
+    Cover sortedCover = new Cover(onSet);
+    sortedCover.sort(new CubeSizeComparator().reversed());
 
-    for (int i = expandedCover.size() - 1; i >= 0; --i) {
-      Cube cube = expandedCover.get(i);
-      Pair<Cube, List<Integer>> pair = singleOutputCubeExpand(cube, expandedCover, offSet);
-      Cube expandedCube = pair.first;
-      List<Integer> coveredCubes = pair.second;
+    HashSet<Integer> removedCubes = new HashSet<>();
+    for (int i = 0; i < sortedCover.size(); i++) {
+      if (removedCubes.contains(i)) continue;
+      Cube cube = sortedCover.get(i);
 
-      coveredCubes.sort(Comparator.reverseOrder());
-      for (int index : coveredCubes) {
-        expandedCover.remove(index);
-      }
-
-      expandedCover.add(expandedCube);
+      Pair<Cube, List<Integer>> pair = singleOutputCubeExpand(cube, sortedCover, offSet);
+      removedCubes.addAll(pair.second);
+      retValue.add(pair.first);
     }
 
-    return expandedCover;
+    return retValue;
   }
 
   public static Pair<Cube, List<Integer>> singleOutputCubeExpand(Cube cube, Cover onSet, Cover offSet) {
+    clearStatic(); //TODO: Code smell.
     SingleOutputBlockingMatrix blockMatrix = new SingleOutputBlockingMatrix(offSet, cube);
     SingleOutputCoverMatrix coverMatrix = new SingleOutputCoverMatrix(onSet, cube);
 
@@ -67,8 +74,8 @@ final public class Expand {
       secondElimination(coverMatrix, removeColumns);
     }
 
-    if (isBlockMatrixEmpty(blockMatrix)) {
-      throw new UnsupportedOperationException("Not finished yet. MinLow procedure.");
+    if (!isBlockMatrixEmpty(blockMatrix)) {
+      throw new UnsupportedOperationException("Not finished yet. MinLow procedure.\n" + loweringSet.toString());
     }
 
     List<Integer> containedRows = rowsContainedByLoweringSet(coverMatrix);
@@ -94,8 +101,6 @@ final public class Expand {
     for (int i = 0; i < coverMatrix.getRowCount(); i++) {
       int rowSum = 0;
       for (int j = 0; j < coverMatrix.getColumnCount(); j++) {
-        if (removedColumns.contains(j)) continue;
-
         if (loweringSet.contains(j)) {
           rowSum += (coverMatrix.getElement(i, j) ? 1 : 0);
         }

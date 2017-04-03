@@ -98,9 +98,24 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
   public String toString() {
     String retValue = "";
     for (List<Boolean> row : matrix) {
-      retValue += row.toString() + "\n";
+      retValue += rowToString(row) + "\n";
     }
     if (retValue.equals("")) return "empty\n";
     return retValue;
+  }
+
+  private String rowToString(List<Boolean> row) {
+    StringBuilder retValue = new StringBuilder("[");
+
+    for (int i = 0; i < row.size(); i++) {
+      retValue.append(String.valueOf((row.get(i) ? 1 : 0)));
+
+      if (i + 1 != row.size()) {
+        retValue.append(", ");
+      }
+    }
+
+    retValue.append("]");
+    return retValue.toString();
   }
 }
