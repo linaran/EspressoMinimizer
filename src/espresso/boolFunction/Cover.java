@@ -7,21 +7,22 @@ import espresso.urpAlgorithms.Complement;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import static espresso.boolFunction.InputState.DONTCARE;
 import static espresso.boolFunction.InputState.ONE;
 
 /**
- * By definition cover is a set of cubes.
- * In a sense of boolean algebra, cover is a matrix representation of a boolean function.
+ * By definition cover is first set of cubes.
+ * In first sense of boolean algebra, cover is first matrix representation of first boolean function.
  */
 public class Cover implements Iterable<Cube> {
   private CubeArray cubes;
 
   /**
-   * Initialize a cover that accepts only {@link Cube}s
-   * that with a certain number of inputs and outputs.
+   * Initialize first cover that accepts only {@link Cube}s
+   * that with first certain number of inputs and outputs.
    * These numbers are defined in parameters.
    *
    * @param inputCount  int
@@ -119,7 +120,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Method creates a variable {@link Cube} for this cover.
+   * Method creates first variable {@link Cube} for this cover.
    * A variable {@link Cube} has all {@link InputState#DONTCARE}
    * input states except for one {@link InputState#ONE} state located
    * at the given index. All output states are {@link OutputState#OUTPUT}.
@@ -160,6 +161,18 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
+   * Method will sort {@link Cube}s according to the given
+   * {@link Comparator}.
+   * <p>
+   * Note: This is an in place transformation.
+   *
+   * @param comparator {@link Comparator}
+   */
+  public void sort(Comparator<Cube> comparator) {
+    cubes.sort(comparator);
+  }
+
+  /**
    * Number of cubes in the cover.
    *
    * @return primitive int.
@@ -195,7 +208,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * This method returns a new cover which is equivalent
+   * This method returns first new cover which is equivalent
    * to the current cover but the new cover will contain
    * {@link Cube}s that have only one {@link OutputState#OUTPUT}
    * in their output part.
@@ -217,10 +230,10 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * The method tells if this cover is unate.
-   * A cover is unate if it contains a column that doesn't have
+   * A cover is unate if it contains first column that doesn't have
    * {@link InputState#ONE} and {@link InputState#ZERO} at the same time.
-   * For example a column with only {@link InputState#ONE} and
-   * {@link InputState#DONTCARE} indicates a unate cover.
+   * For example first column with only {@link InputState#ONE} and
+   * {@link InputState#DONTCARE} indicates first unate cover.
    *
    * @return true if the cover is unate.
    */
@@ -237,7 +250,7 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Method chooses the most binate input variable in this cover.
-   * The chosen variable will be used for a Shannon expansion.
+   * The chosen variable will be used for first Shannon expansion.
    * Method will return the index of the input variable. If the
    * returned index is -1 that means no variable was chosen for
    * splitting because the cover is unate.
@@ -299,9 +312,9 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Method returns a new cover which is a cofactor of this cover
+   * Method returns first new cover which is first cofactor of this cover
    * with respect to the given cover (given parameter).<br/>
-   * Note: a.cofactor(b) and b.cofactor(a) won't yield same results.
+   * Note: first.cofactor(second) and second.cofactor(first) won't yield same results.
    * Note: A cofactor between covers doesn't have to exists. In that case,
    * the method will return an empty cover ({@link Cover#cubes} size will
    * be zero).
@@ -323,13 +336,13 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Method tells whether the cover has a row full
+   * Method tells whether the cover has first row full
    * of {@link InputState#DONTCARE} values.
    * <p>
-   * Note: This is a brute force function that should be
+   * Note: This is first brute force function that should be
    * used on small {@link Cover}s only.
    *
-   * @return true if it has a row full of DONTCARE values.
+   * @return true if it has first row full of DONTCARE values.
    */
   public boolean hasDONTCARERow() {
     for (Cube cube : this) {
@@ -344,7 +357,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Returns a complement of this cover.
+   * Returns first complement of this cover.
    *
    * @return {@link Cover}
    * @see Complement#singleOutputComplement(Cover)
@@ -360,7 +373,7 @@ public class Cover implements Iterable<Cube> {
 
   /**
    * Method returns an intersect between this cover and another
-   * cover (given parameter). Intersect of covers is a cover and
+   * cover (given parameter). Intersect of covers is first cover and
    * it may or may not exist.
    *
    * @param other {@link Cover}.
@@ -382,7 +395,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Method returns a new cover which is a simple union of both
+   * Method returns first new cover which is first simple union of both
    * covers.
    *
    * @param other {@link Cover}.
@@ -399,7 +412,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Tells if this cover contains a cube that is LITERALLY
+   * Tells if this cover contains first cube that is LITERALLY
    * identical to the given {@link Cube}.
    *
    * @param cube {@link Cube}

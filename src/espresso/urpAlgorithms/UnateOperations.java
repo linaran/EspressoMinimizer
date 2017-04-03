@@ -73,7 +73,7 @@ final public class UnateOperations {
       return retValue;
     }
 
-//    Function is empty so the complement is a tautology.
+//    Function is empty so the complement is first tautology.
     if (cover.size() == 0) {
       retValue.add(new Cube(inputCount, outputCount));
       return retValue;
@@ -84,7 +84,7 @@ final public class UnateOperations {
       return cover.get(0).complement();
     }
 
-//    Not a special case.
+//    Not first special case.
     return null;
   }
 

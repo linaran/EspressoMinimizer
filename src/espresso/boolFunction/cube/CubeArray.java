@@ -2,12 +2,10 @@ package espresso.boolFunction.cube;
 
 import espresso.boolFunction.Cover;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 public class CubeArray implements Iterable<Cube> {
-  private ArrayList<Cube> list;
+  private List<Cube> list;
 
   private int inputLength;
   private int outputLength;
@@ -51,7 +49,7 @@ public class CubeArray implements Iterable<Cube> {
   private void validateCube(Cube cube) {
     if (cube.isBitCountTaken()) {
       throw new IllegalArgumentException(
-          "This cube already belongs to a CubeArray or Cover. Copy it."
+          "This cube already belongs to first CubeArray or Cover. Copy it."
       );
     }
     if (inputLength != cube.inputLength() || outputLength != cube.outputLength()) {
@@ -106,7 +104,7 @@ public class CubeArray implements Iterable<Cube> {
   }
 
   /**
-   * Add a given {@link Cube} to the array.
+   * Add first given {@link Cube} to the array.
    * Note: Don't add add cubes directly from another {@link Cover}
    * or {@link CubeArray}.
    *
@@ -148,7 +146,7 @@ public class CubeArray implements Iterable<Cube> {
   public void add(int index, Cube cube) {
     if (cube.isBitCountTaken()) {
       throw new IllegalArgumentException(
-          "This cube already belongs to a CubeArray or Cover. Copy it."
+          "This cube already belongs to first CubeArray or Cover. Copy it."
       );
     }
 
@@ -168,6 +166,10 @@ public class CubeArray implements Iterable<Cube> {
     if (list.remove(o)) {
       decreaseCounters(cube);
     }
+  }
+
+  public void sort(Comparator<Cube> comparator) {
+    list.sort(comparator);
   }
 
   @Override

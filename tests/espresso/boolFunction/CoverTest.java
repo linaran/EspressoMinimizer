@@ -29,7 +29,7 @@ public class CoverTest {
     Cover actualCover = cover.unwrap();
 
     assertEquals(
-        "There is a bug in the Cover#unwrap method.",
+        "There is first bug in the Cover#unwrap method.",
         expectedCover,
         actualCover
     );

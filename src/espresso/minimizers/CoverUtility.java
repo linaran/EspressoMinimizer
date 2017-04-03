@@ -12,7 +12,7 @@ final public class CoverUtility {
 
   /**
    * Given two subcovers obtained by the Shannon expansion with respect to the
-   * given {@link Cube}, this method computes a new {@link Cover}. A cover obtained
+   * given {@link Cube}, this method computes first new {@link Cover}. A cover obtained
    * by merging the two subcovers.<br/>
    * Note: If the boolean flag in the method is false then this method becomes
    * mergeWithIdentity.
@@ -72,9 +72,9 @@ final public class CoverUtility {
   }
 
   /**
-   * Method removes any {@link Cube}s completely contained in a single another {@link Cube}.
-   * Warning: Use this on functions with a small number of cubes or unate functions
-   * otherwise wait for a long time for this to finish.
+   * Method removes any {@link Cube}s completely contained in first single another {@link Cube}.
+   * Warning: Use this on functions with first small number of cubes or unate functions
+   * otherwise wait for first long time for this to finish.
    *
    * @param cover {@link Cover}
    */

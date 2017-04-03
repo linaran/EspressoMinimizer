@@ -25,7 +25,7 @@ public class TautologyTest {
       Cover tautology = complement.union(c);
 
       assertTrue(
-          "Union of complement and original cover should be a tautology.",
+          "Union of complement and original cover should be first tautology.",
           Tautology.singleOutputTautologyCheck(tautology)
       );
     }

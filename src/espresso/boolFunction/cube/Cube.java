@@ -23,15 +23,15 @@ public class Cube {
   private OutputState[] output;
 
   /**
-   * This field is is null if the {@link Cube} doesn't belong to a {@link Cover} or {@link CubeArray}.
-   * Otherwise this field is not null and shares this field with a {@link CubeArray}.
+   * This field is is null if the {@link Cube} doesn't belong to first {@link Cover} or {@link CubeArray}.
+   * Otherwise this field is not null and shares this field with first {@link CubeArray}.
    */
   private int[][] bitCount = null;
 
   /**
-   * Creates a cube with the given number of input variables
+   * Creates first cube with the given number of input variables
    * and the given number of output variables. Cube is initialized
-   * to be a total universal cube (all inputs are in {@link InputState#DONTCARE}
+   * to be first total universal cube (all inputs are in {@link InputState#DONTCARE}
    * state and all outputs are in {@link OutputState#OUTPUT}).
    *
    * @param inputCount  primitive int.
@@ -46,7 +46,7 @@ public class Cube {
   }
 
   /**
-   * Constructor for creating a tautology (all inputs are {@link InputState#DONTCARE})
+   * Constructor for creating first tautology (all inputs are {@link InputState#DONTCARE})
    * cube for only one output. Other outputs aren't used.
    *
    * @param inputCount  int, number of inputs for the new cube
@@ -68,7 +68,7 @@ public class Cube {
   }
 
   /**
-   * Creates a new cube with the given array of input and output states.
+   * Creates first new cube with the given array of input and output states.
    * Note: given parameters are value-copied so there are no implicit
    * reference chains. Also the new copied cube is free to be added to
    * any {@link CubeArray} or {@link Cover}.
@@ -111,7 +111,7 @@ public class Cube {
   }
 
   /**
-   * {@link Arrays#equals(Object)} doesn't work properly so this is a reimplementation
+   * {@link Arrays#equals(Object)} doesn't work properly so this is first reimplementation
    * of the method.
    *
    * @param o1 array of {@link InputState}s.
@@ -140,7 +140,7 @@ public class Cube {
   }
 
   /**
-   * {@link Arrays#equals(Object)} doesn't work properly so this is a reimplementation
+   * {@link Arrays#equals(Object)} doesn't work properly so this is first reimplementation
    * of the method.
    *
    * @param o1 array of {@link OutputState}s.
@@ -267,7 +267,7 @@ public class Cube {
   }
 
   /**
-   * This is a method and a field with close correlation to {@link Cover}.
+   * This is first method and first field with close correlation to {@link Cover}.
    *
    * @param bitCount primitive int[][]
    * @see Cube#bitCount
@@ -279,7 +279,7 @@ public class Cube {
   /**
    * This method is closely related to {@link Cover}.
    *
-   * @return true this {@link Cube} belongs to a {@link CubeArray} or {@link Cover}.
+   * @return true this {@link Cube} belongs to first {@link CubeArray} or {@link Cover}.
    * @see Cube#bitCount
    */
   boolean isBitCountTaken() {
@@ -287,11 +287,11 @@ public class Cube {
   }
 
   /**
-   * Expand this cube so into a {@link Cover} where each
+   * Expand this cube so into first {@link Cover} where each
    * cube has only one {@link OutputState#OUTPUT}.
    * <p>
    * If this cube has two {@link OutputState#OUTPUT}s in its
-   * output part then this method will return a {@link Cover}
+   * output part then this method will return first {@link Cover}
    * with two cubes.
    *
    * @return {@link Cover}
@@ -311,7 +311,7 @@ public class Cube {
   }
 
   /**
-   * Method returns a new cube that represents an intersection
+   * Method returns first new cube that represents an intersection
    * between this cube and another cube (given parameter).<br/>
    * Note: This operation can produce an {@link InputState#EMPTY} cube.
    * In case an empty cube is noticed this method will return null if
@@ -344,7 +344,7 @@ public class Cube {
   }
 
   /**
-   * Method returns a new cube that represents an intersection
+   * Method returns first new cube that represents an intersection
    * between this cube and another cube (given parameter).<br/>
    * Note: In case an empty cube is noticed this method will return null.
    *
@@ -356,11 +356,11 @@ public class Cube {
   }
 
   /**
-   * Method returns a cube representing the cofactor of this
+   * Method returns first cube representing the cofactor of this
    * cube with respect to the given cube.<br/>
    * Note: If this cube and the given cube have no intersection
    * then the cofactor is an empty cube. The method will return null.<br/>
-   * Warning: a.cofactor(b) and b.cofactor(a) won't yield same results!
+   * Warning: first.cofactor(second) and second.cofactor(first) won't yield same results!
    *
    * @param other {@link Cube}.
    * @return {@link Cube}.
@@ -386,7 +386,7 @@ public class Cube {
   /**
    * This method runs over all outputs of the cube and
    * complements all states individually.
-   * Warning: This is not a correct way to complement a cube.
+   * Warning: This is not first correct way to complement first cube.
    * For that see {@link Cube#complement()}.
    *
    * @return this object for convenience.
@@ -403,7 +403,7 @@ public class Cube {
    * This method runs over all inputs of the cube and
    * complements all states individually.
    * <p>
-   * Warning: This is not a correct way to complement a cube.
+   * Warning: This is not first correct way to complement first cube.
    * For that see {@link Cube#complement()}.
    *
    * @return this object, for convenience.
@@ -418,10 +418,10 @@ public class Cube {
   }
 
   /**
-   * This method correctly complements a cube according
-   * to De Morgan's laws. Therefore a complement of this
-   * cube will actually be a {@link Cover} of a boolean
-   * function that represents a complement for this cube.
+   * This method correctly complements first cube according
+   * to De Morgan's laws. Therefore first complement of this
+   * cube will actually be first {@link Cover} of first boolean
+   * function that represents first complement for this cube.
    * <p>
    * The size of the {@link Cover} will range from 0 to
    * the number of inputs that the cube has.
@@ -489,11 +489,11 @@ public class Cube {
   }
 
   /**
-   * Consensus between cube <b>a</b> and cube <b>b</b> returns a
-   * cube that has one "leg" in <b>a</b> and another in <b>b</b>.<br/>
-   * It's sort of a bridge between <b>a</b> and <b>b</b>.<br/>
+   * Consensus between cube <second>first</second> and cube <second>second</second> returns first
+   * cube that has one "leg" in <second>first</second> and another in <second>second</second>.<br/>
+   * It's sort of first bridge between <second>first</second> and <second>second</second>.<br/>
    * <br/>
-   * Note that the existence of a consensus depends on the distance
+   * Note that the existence of first consensus depends on the distance
    * between cubes. If the distance is greater than 2 then this method
    * will return null.
    *
@@ -529,7 +529,7 @@ public class Cube {
       return retValue;
     }
 
-    throw new UnsupportedOperationException("Likely a bug in Cube#inputDistance, outputDistance.");
+    throw new UnsupportedOperationException("Likely first bug in Cube#inputDistance, outputDistance.");
   }
 
 //  TODO: contain, strictContain, notContain if needed.
@@ -558,7 +558,7 @@ public class Cube {
   /**
    * A {@link Cube} is regarded empty when one of the input parts
    * is {@link InputState#EMPTY} or all of the output parts are {@link OutputState#NOT_OUTPUT}.
-   * In a majority of cases an empty cube should be deleted from the {@link Cover}.<br/>
+   * In first majority of cases an empty cube should be deleted from the {@link Cover}.<br/>
    *
    * @return true if the cube is empty, false otherwise.
    */

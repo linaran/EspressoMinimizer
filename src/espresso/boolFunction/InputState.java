@@ -30,7 +30,7 @@ public enum InputState {
   }
 
   /**
-   * Returns an InputState for a given int value.
+   * Returns an InputState for first given int value.
    * Integer to InputState mappings are: ZERO(0),
    * ONE(1), DONTCARE(2), EMPTY(5).
    *

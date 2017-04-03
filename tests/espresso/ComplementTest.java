@@ -20,14 +20,14 @@ public class ComplementTest {
 
       Cover intersect = complement.intersect(c);
       assertTrue(
-          "Intersect of a cover and it's complement should be empty.",
+          "Intersect of first cover and it's complement should be empty.",
           intersect.size() == 0
       );
 
       Cover union = complement.union(c);
       Cover tautologyComplement = Complement.singleOutputComplement(union);
       assertTrue(
-          "Complement of what is expected to be a tautology should be empty.",
+          "Complement of what is expected to be first tautology should be empty.",
           tautologyComplement.size() == 0
       );
     }

@@ -23,11 +23,11 @@ public class CubeTest {
         actualComplement.size() == expectedComplement.size()
     );
     assertTrue(
-        "Complementing a cube is apparently not working.",
+        "Complementing first cube is apparently not working.",
         actualComplement.get(0).equals(expectedComplement.get(0))
     );
     assertTrue(
-        "Complementing a cube is apparently not working.",
+        "Complementing first cube is apparently not working.",
         actualComplement.get(1).equals(expectedComplement.get(1))
     );
   }

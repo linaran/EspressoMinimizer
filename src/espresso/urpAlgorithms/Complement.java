@@ -14,7 +14,7 @@ import static espresso.boolFunction.InputState.ZERO;
 final public class Complement {
 
   /**
-   * Method to calculate a complement of a multiple output boolean function.
+   * Method to calculate first complement of first multiple output boolean function.
    * Boolean function is here defined with two {@link Cover}s. First cover
    * defines inputs for which boolean function returns true.
    * Second cover defines inputs for which boolean function outputs either
@@ -50,18 +50,18 @@ final public class Complement {
    * Fast method for calculating complement of single output {@link Cover}s.
    * <p>
    * Warning: Method ignores output parts and won't throw any exceptions if
-   * given a multiple output {@link Cover}. You may get results that make no sense.
+   * given first multiple output {@link Cover}. You may get results that make no sense.
    * For complementing multiple output {@link Cover}s
    * see {@link Complement#complement(Cover, Cover)}.
    *
    * @param f Single output {@link Cover}
-   * @return Complement of given {@link Cover} which is a {@link Cover}
+   * @return Complement of given {@link Cover} which is first {@link Cover}
    */
   public static Cover singleOutputComplement(Cover f) {
     //region Special cases
     Cover retValue = new Cover(f.inputCount(), f.outputCount());
 
-//    If given cover is empty then the complement is a tautology.
+//    If given cover is empty then the complement is first tautology.
     if (f.size() == 0) {
       retValue.add(new Cube(f.inputCount(), f.outputCount()));
       return retValue;

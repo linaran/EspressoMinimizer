@@ -11,8 +11,8 @@ import java.util.List;
 
 public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
-  protected List<List<Boolean>> matrix = new ArrayList<>();
-//  TODO: Output part blocking matrix.
+  private int[] trueColumnCount;
+  private List<List<Boolean>> matrix = new ArrayList<>();
 
   public CubeExpansionMatrix(Cover cover, Cube cube) {
     //region Exception Check
@@ -29,6 +29,8 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     }
     //endregion
 
+    trueColumnCount = new int[cover.get(0).inputLength()];
+
     for (Cube coverCube : cover) {
       List<Boolean> row = new ArrayList<>();
 
@@ -36,7 +38,9 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
         InputState cubeInputState = cube.getInputState(j);
         InputState coverCubeInputState = coverCube.getInputState(j);
 
-        row.add(generateMatrixElement(coverCubeInputState, cubeInputState));
+        boolean matrixElement = generateMatrixElement(coverCubeInputState, cubeInputState);
+        trueColumnCount[j] += (matrixElement ? 1 : 0);
+        row.add(matrixElement);
       }
 
       matrix.add(row);
@@ -60,8 +64,30 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     return matrix.get(0).size();
   }
 
+  public int getTrueColumnCount(int index) {
+    return trueColumnCount[index];
+  }
+
+  public int getFalseColumnCount(int index) {
+    return getRowCount() - trueColumnCount[index];
+  }
+
   public boolean getElement(int i, int j) {
     return matrix.get(i).get(j);
+  }
+
+  public int getTrueRowCount(int rowIndex) {
+    int retValue = 0;
+
+    for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
+      retValue += (getElement(rowIndex, columnIndex) ? 1 : 0);
+    }
+
+    return retValue;
+  }
+
+  public int getFalseRowCount(int rowIndex) {
+    return getColumnCount() - getTrueColumnCount(rowIndex);
   }
 
   public boolean isEmpty() {
