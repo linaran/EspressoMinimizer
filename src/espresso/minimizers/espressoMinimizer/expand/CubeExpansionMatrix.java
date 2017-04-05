@@ -4,14 +4,17 @@ package espresso.minimizers.espressoMinimizer.expand;
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.InputState;
 import espresso.boolFunction.cube.Cube;
+import espresso.utils.IgnoreIndexIterator;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
   private int[] trueColumnCount;
+
+  private Set<Integer> ignoredColumns = new HashSet<>();
+  private Set<Integer> ignoredRows = new HashSet<>();
+
   private List<List<Boolean>> matrix = new ArrayList<>();
 
   public CubeExpansionMatrix(Cover cover, Cube cube) {
@@ -56,6 +59,38 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     return matrix.iterator();
   }
 
+  public Iterator<Integer> ignoreRowsIterator() {
+    return new IgnoreIndexIterator(getRowCount(), ignoredRows);
+  }
+
+  public Iterator<Integer> ignoreColumnsIterator() {
+    return new IgnoreIndexIterator(getColumnCount(), ignoredColumns);
+  }
+
+  public void clearIgnoredRows() {
+    ignoredRows.clear();
+  }
+
+  public void clearIgnoredColumns() {
+    ignoredColumns.clear();
+  }
+
+  public void addIgnoredColumns(Integer... columns) {
+    ignoredColumns.addAll(Arrays.asList(columns));
+  }
+
+  public void addIgnoredRows(Integer... rows) {
+    ignoredRows.addAll(Arrays.asList(rows));
+  }
+
+  public boolean isRowIgnored(int row) {
+    return ignoredRows.contains(row);
+  }
+
+  public boolean isColumnIgnored(int column) {
+    return ignoredColumns.contains(column);
+  }
+
   public int getRowCount() {
     return matrix.size();
   }
@@ -72,10 +107,6 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     return getRowCount() - trueColumnCount[index];
   }
 
-  public boolean getElement(int i, int j) {
-    return matrix.get(i).get(j);
-  }
-
   public int getTrueRowCount(int rowIndex) {
     int retValue = 0;
 
@@ -90,8 +121,8 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     return getColumnCount() - getTrueColumnCount(rowIndex);
   }
 
-  public boolean isEmpty() {
-    return matrix.size() == 0;
+  public boolean getElement(int i, int j) {
+    return matrix.get(i).get(j);
   }
 
   @Override

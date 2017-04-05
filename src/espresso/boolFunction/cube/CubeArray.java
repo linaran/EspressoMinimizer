@@ -185,11 +185,9 @@ public class CubeArray implements Iterable<Cube> {
     private Iterator<Cube> iterator = CubeArray.this.list.iterator();
     private Cube currentCube;
 
-
     public boolean hasNext() {
       return iterator.hasNext();
     }
-
 
     public Cube next() {
       currentCube = iterator.next();
