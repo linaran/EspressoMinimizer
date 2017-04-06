@@ -5,6 +5,8 @@ import espresso.boolFunction.InputState;
 import espresso.boolFunction.cube.Cube;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import static espresso.boolFunction.InputState.ONE;
 import static espresso.boolFunction.InputState.ZERO;
@@ -21,16 +23,15 @@ public class SingleOutputCoverMatrix extends CubeExpansionMatrix {
         cubeInputState == ZERO && coverInputState != ZERO;
   }
 
-  public HashSet<Integer> computeCoveringSet(
+  public Set<Integer> computeCoveringSet(
       HashSet<Integer> loweringSet,
       HashSet<Integer> raisingSet,
-      HashSet<Integer> ignoringColumns,
       int rowIndex
   ) {
-    HashSet<Integer> coveringSet = new HashSet<>();
+    Set<Integer> coveringSet = new HashSet<>();
 
-    for (int j = 0; j < getColumnCount(); j++) {
-      if (ignoringColumns.contains(j)) continue;
+    for (Iterator<Integer> columnIter = ignoreColumnsIterator(); columnIter.hasNext(); ) {
+      int j = columnIter.next();
 
       if (!loweringSet.contains(j) && !raisingSet.contains(j) && getElement(rowIndex, j)) {
         coveringSet.add(j);
@@ -40,14 +41,16 @@ public class SingleOutputCoverMatrix extends CubeExpansionMatrix {
     return coveringSet;
   }
 
-  public int maxTrueCountColumnIndex() {
+  public int maxTrueCountColumnIndex(boolean countIgnoredValues) {
     int maxColumnIndex = -1;
     int maxTrueCount = -1;
 
     for (int j = 0; j < getColumnCount(); j++) {
-      if (getTrueColumnCount(j) > maxTrueCount) {
+      if (!countIgnoredValues && isColumnIgnored(j)) continue;
+
+      if (getTrueColumnCount(j, countIgnoredValues) > maxTrueCount) {
         maxColumnIndex = j;
-        maxTrueCount = getTrueColumnCount(j);
+        maxTrueCount = getTrueColumnCount(j, countIgnoredValues);
       }
     }
 

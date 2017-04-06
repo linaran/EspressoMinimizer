@@ -1,4 +1,4 @@
-package espresso;
+package espresso.utils;
 
 /**
  * Simple class to return two different objects in some methods.

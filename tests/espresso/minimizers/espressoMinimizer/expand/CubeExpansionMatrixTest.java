@@ -1,11 +1,19 @@
 package espresso.minimizers.espressoMinimizer.expand;
 
 import espresso.boolFunction.Cover;
+import espresso.boolFunction.InputState;
+import espresso.boolFunction.OutputState;
+import espresso.boolFunction.cube.Cube;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Iterator;
 
+import static espresso.boolFunction.InputState.ONE;
+import static espresso.boolFunction.InputState.ZERO;
+import static espresso.boolFunction.OutputState.OUTPUT;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class CubeExpansionMatrixTest {
@@ -94,5 +102,68 @@ public class CubeExpansionMatrixTest {
         expected,
         actual
     );
+  }
+
+  @Test
+  public void getTrueColumnCountWithoutCountingIgnoredRows() throws Exception {
+    Cover cover = new Cover("testCase3.txt");
+    Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
+
+    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    matrix.addIgnoredRows(0, 4);
+
+    int expected = 3;
+    int actual = matrix.getTrueColumnCount(1, false);
+
+    assertEquals(
+        "Value count is incorrect.",
+        expected,
+        actual
+    );
+  }
+
+  @Test
+  public void getTrueColumnCountWithCountingIgnoredRows() throws Exception {
+    Cover cover = new Cover("testCase3.txt");
+    Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
+
+    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    matrix.addIgnoredRows(0, 4);
+
+    int expected = 4;
+    int actual = matrix.getTrueColumnCount(1, true);
+
+    assertEquals(
+        "Value count is incorrect.",
+        expected,
+        actual
+    );
+  }
+
+  @Test
+  public void getFalseColumnCountWithoutCountingIgnoredRows() throws Exception {
+    Cover cover = new Cover("testCase3.txt");
+    Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
+
+    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    matrix.addIgnoredRows(0, 4);
+
+    int expected = 5;
+    int actual = matrix.getFalseColumnCount(1, false);
+
+    assertEquals(
+        "Value count is incorrect.",
+        expected,
+        actual
+    );
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void outOfRangeIndexForAddingIgnoringElementsShouldThrowException() throws Exception {
+    Cover cover = new Cover("testCase1.txt");
+    Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
+
+    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    matrix.addIgnoredRows(100);
   }
 }

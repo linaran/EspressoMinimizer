@@ -1,6 +1,6 @@
 package espresso.minimizers.espressoMinimizer.expand;
 
-import espresso.Pair;
+import espresso.utils.Pair;
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.cube.Cube;
 
@@ -11,17 +11,9 @@ final public class Expand {
   private static HashSet<Integer> loweringSet = new HashSet<>();
   private static HashSet<Integer> raisingSet = new HashSet<>();
 
-  private static HashSet<Integer> removedCoverRows = new HashSet<>();
-  private static HashSet<Integer> removedBlockRows = new HashSet<>();
-  private static HashSet<Integer> removedColumns = new HashSet<>();
-
   private static void clearStatic() {
     loweringSet.clear();
     raisingSet.clear();
-
-    removedCoverRows.clear();
-    removedBlockRows.clear();
-    removedColumns.clear();
   }
 
   private Expand() {
@@ -51,18 +43,21 @@ final public class Expand {
     SingleOutputCoverMatrix coverMatrix = new SingleOutputCoverMatrix(onSet, cube);
 
     while (loweringSet.size() + raisingSet.size() < blockMatrix.getColumnCount() &&
-        !isBlockMatrixEmpty(blockMatrix) &&
-        !isCoverMatrixEmpty(coverMatrix)) {
+        !blockMatrix.isFullyIgnored() &&
+        !coverMatrix.isFullyIgnored()) {
 
       List<Integer> essentialColumns = essentialColumns(blockMatrix);
       loweringSet.addAll(essentialColumns);
 
-      firstElimination(blockMatrix, removedBlockRows, essentialColumns);
-      firstElimination(coverMatrix, removedCoverRows, essentialColumns);
+      firstElimination(blockMatrix, essentialColumns);
+      firstElimination(coverMatrix, essentialColumns);
 
-      HashSet<Integer> maximumCoveringSet = maximumFeasibleCoveringSet(blockMatrix, coverMatrix);
+      Set<Integer> maximumCoveringSet = maximumFeasibleCoveringSet(blockMatrix, coverMatrix);
       if (maximumCoveringSet.size() == 0) {
-        maximumCoveringSet.add(egProcedure(coverMatrix));
+        int maxColumn = egProcedure(coverMatrix);
+        if (maxColumn != -1) {
+          maximumCoveringSet.add(maxColumn);
+        }
       }
 
       List<Integer> inessentialColumns = inessentialColumns(blockMatrix);
@@ -71,10 +66,10 @@ final public class Expand {
 
       List<Integer> removeColumns = new ArrayList<>(inessentialColumns);
       removeColumns.addAll(maximumCoveringSet);
-      secondElimination(coverMatrix, removeColumns);
+      secondElimination(blockMatrix, coverMatrix, removeColumns);
     }
 
-    if (!isBlockMatrixEmpty(blockMatrix)) {
+    if (!blockMatrix.isFullyIgnored()) {
       throw new UnsupportedOperationException("Not finished yet. MinLow procedure.\n" + loweringSet.toString());
     }
 
@@ -115,25 +110,28 @@ final public class Expand {
   }
 
   private static int egProcedure(SingleOutputCoverMatrix coverMatrix) {
-    return coverMatrix.maxTrueCountColumnIndex();
+    return coverMatrix.maxTrueCountColumnIndex(false);
   }
 
-  private static HashSet<Integer> maximumFeasibleCoveringSet(
+  private static Set<Integer> maximumFeasibleCoveringSet(
       SingleOutputBlockingMatrix blockMatrix,
       SingleOutputCoverMatrix coverMatrix
   ) {
-    List<HashSet<Integer>> coveringSets = computeFeasibleCoveringSets(
+    Set<Set<Integer>> coveringSets = computeFeasibleCoveringSets(
         blockMatrix,
         coverMatrix
     );
 
-    HashSet<Integer> maxCoveringSet = coveringSets.get(0);
+    if (coveringSets.size() == 0) {
+      return new HashSet<>();
+    }
+
+    Set<Integer> maxCoveringSet = coveringSets.iterator().next();
     int maxContainmentCount = 0;
 
-    for (HashSet<Integer> currentSet : coveringSets) {
+    for (Set<Integer> currentSet : coveringSets) {
       int containmentCount = 0;
-      for (HashSet<Integer> otherSet : coveringSets) {
-//        Didn't mix this up with equals.
+      for (Set<Integer> otherSet : coveringSets) {
         if (currentSet != otherSet && currentSet.containsAll(otherSet)) {
           ++containmentCount;
         }
@@ -148,17 +146,21 @@ final public class Expand {
     return maxCoveringSet;
   }
 
-  private static List<HashSet<Integer>> computeFeasibleCoveringSets(
+  private static Set<Set<Integer>> computeFeasibleCoveringSets(
       SingleOutputBlockingMatrix blockingMatrix,
       SingleOutputCoverMatrix coverMatrix
   ) {
-    List<HashSet<Integer>> coveringSets = new ArrayList<>();
+    Set<Set<Integer>> coveringSets = new HashSet<>();
 
-    for (int i = 0; i < coverMatrix.getRowCount(); i++) {
-      if (removedCoverRows.contains(i)) continue;
+    for (Iterator<Integer> rowIter = coverMatrix.ignoreRowsIterator(); rowIter.hasNext(); ) {
+      int i = rowIter.next();
 
-      if (isFeasiblyCovered(i, blockingMatrix, coverMatrix)) {
-        coveringSets.add(coverMatrix.computeCoveringSet(loweringSet, raisingSet, removedColumns, i));
+      Set<Integer> coveringSet = coverMatrix.computeCoveringSet(loweringSet, raisingSet, i);
+      if (!coveringSets.contains(coveringSet) &&
+          coveringSet.size() != 0 &&
+          isFeasiblyCovered(i, blockingMatrix, coverMatrix)
+          ) {
+        coveringSets.add(coveringSet);
       }
     }
 
@@ -171,12 +173,13 @@ final public class Expand {
       SingleOutputCoverMatrix coverMatrix
   ) {
 
-    for (int i = 0; i < blockMatrix.getRowCount(); i++) {
-      if (removedBlockRows.contains(i)) continue;
+    for (Iterator<Integer> rowIter = blockMatrix.ignoreRowsIterator(); rowIter.hasNext(); ) {
+      int i = rowIter.next();
 
       int rowSum = 0;
-      for (int j = 0; j < coverMatrix.getColumnCount(); j++) {
-        if (removedColumns.contains(j) || raisingSet.contains(j)) continue;
+      for (Iterator<Integer> columnIter = blockMatrix.ignoreColumnsIterator(); columnIter.hasNext(); ) {
+        int j = columnIter.next();
+        if (raisingSet.contains(j)) continue;
 
         if (loweringSet.contains(j) || !coverMatrix.getElement(coverRowIndex, j)) {
           rowSum += (blockMatrix.getElement(i, j) ? 1 : 0);
@@ -194,14 +197,14 @@ final public class Expand {
   private static List<Integer> essentialColumns(SingleOutputBlockingMatrix blockMatrix) {
     List<Integer> retValue = new ArrayList<>();
 
-    for (int i = 0; i < blockMatrix.getRowCount(); i++) {
-      if (removedBlockRows.contains(i)) continue;
+    for (Iterator<Integer> rowIter = blockMatrix.ignoreRowsIterator(); rowIter.hasNext(); ) {
+      int i = rowIter.next();
 
       int rowSum = 0;
       int oneIndex = 0;
 
-      for (int j = 0; j < blockMatrix.getColumnCount(); j++) {
-        if (removedColumns.contains(j)) continue;
+      for (Iterator<Integer> columnIter = blockMatrix.ignoreColumnsIterator(); columnIter.hasNext(); ) {
+        int j = columnIter.next();
 
         rowSum += (blockMatrix.getElement(i, j) ? 1 : 0);
         if (blockMatrix.getElement(i, j)) {
@@ -220,20 +223,8 @@ final public class Expand {
   private static List<Integer> inessentialColumns(SingleOutputBlockingMatrix matrix) {
     List<Integer> retValue = new ArrayList<>();
 
-    for (int j = 0; j < matrix.getColumnCount(); j++) {
-      if (removedColumns.contains(j)) continue;
-
-      //region Vanilla
-      //      boolean hasTrue = false;
-      //      for (int i = 0; i < matrix.getRowCount(); i++) {
-      //        if (removedBlockRows.contains(i)) continue;
-      //        hasTrue = hasTrue || matrix.getElement(i, j);
-      //      }
-      //
-      //      if (!hasTrue) {
-      //        retValue.add(j);
-      //      }
-      //endregion
+    for (Iterator<Integer> iter = matrix.ignoreColumnsIterator(); iter.hasNext(); ) {
+      int j = iter.next();
 
       if (matrix.getFalseColumnCount(j) == 0) {
         retValue.add(j);
@@ -243,20 +234,16 @@ final public class Expand {
     return retValue;
   }
 
-  private static void firstElimination(
-      CubeExpansionMatrix matrix,
-      HashSet<Integer> removedRows,
-      List<Integer> essentialColumns
-  ) {
+  private static void firstElimination(CubeExpansionMatrix matrix, List<Integer> essentialColumns) {
     for (int columnIndex : essentialColumns) {
-      if (removedColumns.contains(columnIndex)) continue;
-      removedColumns.add(columnIndex);
+      if (matrix.isColumnIgnored(columnIndex)) continue;
+      matrix.addIgnoredColumns(columnIndex);
 
-      for (int i = 0; i < matrix.getRowCount(); i++) {
-        if (removedRows.contains(i)) continue;
+      for (Iterator<Integer> iter = matrix.ignoreRowsIterator(); iter.hasNext(); ) {
+        int i = iter.next();
 
         if (matrix.getElement(i, columnIndex)) {
-          removedRows.add(i);
+          matrix.addIgnoredRows(i);
         }
       }
     }
@@ -264,33 +251,25 @@ final public class Expand {
 
   //  When something is added to raisingSet.
   private static void secondElimination(
+      SingleOutputBlockingMatrix blockMatrix,
       SingleOutputCoverMatrix coverMatrix,
       List<Integer> columns
   ) {
-    removedColumns.addAll(columns);
+    blockMatrix.addIgnoredColumns(columns);
+    coverMatrix.addIgnoredColumns(columns);
 
-    for (int i = 0; i < coverMatrix.getRowCount(); ++i) {
-      if (removedCoverRows.contains(i)) continue;
+    for (Iterator<Integer> rowIter = coverMatrix.ignoreRowsIterator(); rowIter.hasNext(); ) {
+      int i = rowIter.next();
 
       Boolean hasTrue = false;
-      for (int j = 0; j < coverMatrix.getColumnCount(); ++j) {
-        if (removedColumns.contains(j)) continue;
+      for (Iterator<Integer> columnIter = coverMatrix.ignoreColumnsIterator(); columnIter.hasNext(); ) {
+        int j = columnIter.next();
         hasTrue = hasTrue || coverMatrix.getElement(i, j);
       }
 
       if (!hasTrue) {
-        removedCoverRows.add(i);
+        coverMatrix.addIgnoredRows(i);
       }
     }
-  }
-
-  private static boolean isBlockMatrixEmpty(SingleOutputBlockingMatrix blockMatrix) {
-    return removedColumns.size() == blockMatrix.getColumnCount() ||
-        removedBlockRows.size() == blockMatrix.getRowCount();
-  }
-
-  private static boolean isCoverMatrixEmpty(SingleOutputCoverMatrix coverMatrix) {
-    return removedColumns.size() == coverMatrix.getColumnCount() ||
-        removedCoverRows.size() == coverMatrix.getRowCount();
   }
 }

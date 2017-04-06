@@ -11,6 +11,7 @@ import java.util.*;
 public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
   private int[] trueColumnCount;
+  private int[] trueIgnoreColumnCount;
 
   private Set<Integer> ignoredColumns = new HashSet<>();
   private Set<Integer> ignoredRows = new HashSet<>();
@@ -33,6 +34,7 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
     //endregion
 
     trueColumnCount = new int[cover.get(0).inputLength()];
+    trueIgnoreColumnCount = new int[cover.get(0).inputLength()];
 
     for (Cube coverCube : cover) {
       List<Boolean> row = new ArrayList<>();
@@ -69,18 +71,56 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
   public void clearIgnoredRows() {
     ignoredRows.clear();
+    Arrays.fill(trueIgnoreColumnCount, 0);
   }
 
   public void clearIgnoredColumns() {
     ignoredColumns.clear();
   }
 
+  protected void validateColumnIndex(int column) {
+    if (column < 0 || column >= getColumnCount()) {
+      throw new IndexOutOfBoundsException("Column index out of bounds.");
+    }
+  }
+
+  protected void validateRowIndex(int row) {
+    if (row < 0 || row >= getRowCount()) {
+      throw new IndexOutOfBoundsException("Row index out of bounds.");
+    }
+  }
+
+  private void increaseTrueIgnoreColumnCount(int row) {
+    for (int j = 0; j < getColumnCount(); j++) {
+      boolean value = getElement(row, j);
+      trueIgnoreColumnCount[j] += (value ? 1 : 0);
+    }
+  }
+
   public void addIgnoredColumns(Integer... columns) {
-    ignoredColumns.addAll(Arrays.asList(columns));
+    addIgnoredColumns(Arrays.asList(columns));
+  }
+
+  public void addIgnoredColumns(Collection<Integer> columns) {
+    for (int column : columns) {
+      validateColumnIndex(column);
+      ignoredColumns.add(column);
+    }
   }
 
   public void addIgnoredRows(Integer... rows) {
-    ignoredRows.addAll(Arrays.asList(rows));
+    addIgnoredRows(Arrays.asList(rows));
+  }
+
+  public void addIgnoredRows(Collection<Integer> rows) {
+    for (int row : rows) {
+      validateRowIndex(row);
+
+      if (!ignoredRows.contains(row)) {
+        increaseTrueIgnoreColumnCount(row);
+      }
+      ignoredRows.add(row);
+    }
   }
 
   public boolean isRowIgnored(int row) {
@@ -100,11 +140,28 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
   }
 
   public int getTrueColumnCount(int index) {
-    return trueColumnCount[index];
+    return getTrueColumnCount(index, true);
+  }
+
+  public int getTrueColumnCount(int index, boolean countIgnoredValues) {
+    if (countIgnoredValues) {
+      return trueColumnCount[index];
+    } else {
+      return trueColumnCount[index] - trueIgnoreColumnCount[index];
+    }
   }
 
   public int getFalseColumnCount(int index) {
-    return getRowCount() - trueColumnCount[index];
+    return getFalseColumnCount(index, true);
+  }
+
+  public int getFalseColumnCount(int index, boolean countIgnoredValues) {
+    if (countIgnoredValues) {
+      return getRowCount() - trueColumnCount[index];
+    } else {
+      int ignoredFalseCount = ignoredRows.size() - trueIgnoreColumnCount[index];
+      return (getRowCount() - trueColumnCount[index]) - ignoredFalseCount;
+    }
   }
 
   public int getTrueRowCount(int rowIndex) {
@@ -123,6 +180,19 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
   public boolean getElement(int i, int j) {
     return matrix.get(i).get(j);
+  }
+
+  public Set<Integer> getIgnoredColumns() {
+    return Collections.unmodifiableSet(ignoredColumns);
+  }
+
+  public Set<Integer> getIgnoredRows() {
+    return Collections.unmodifiableSet(ignoredRows);
+  }
+
+  public boolean isFullyIgnored() {
+    return getColumnCount() == ignoredColumns.size() ||
+        getRowCount() == ignoredRows.size();
   }
 
   @Override
