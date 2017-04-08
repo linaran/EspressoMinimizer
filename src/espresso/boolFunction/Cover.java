@@ -7,6 +7,7 @@ import espresso.urpAlgorithms.Complement;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
@@ -147,31 +148,16 @@ public class Cover implements Iterable<Cube> {
     cubes.addAll(cover.cubes);
   }
 
+  public void addAll(Collection<? extends Cube> c) {
+    cubes.addAll(c);
+  }
+
   public void remove(Cube cube) {
     cubes.remove(cube);
   }
 
   public Cube remove(int index) {
     return cubes.remove(index);
-  }
-
-  /**
-   * Removes a {@link Cube} located at the given index.
-   * <p>
-   * WARNING: This method doesn't care about maintaining
-   * an order of {@link Cube}s before and after removal.
-   * It only removes a {@link Cube} with O(1) complexity.
-   *
-   * @param index int
-   * @return removed {@link Cube}
-   */
-  public Cube orderBreakRemove(int index) {
-    if (index == size() - 1) {
-      remove(index);
-    }
-
-    cubes.swapCubes(index, size() - 1);
-    return remove(size() - 1);
   }
 
   public Cube get(int index) {
