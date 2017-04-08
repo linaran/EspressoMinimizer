@@ -59,8 +59,7 @@ public class Cover implements Iterable<Cube> {
   /**
    * Reads only single output functions for now.
    *
-   * @param filepath  {@link String}
-   * @param splitChar {@link String}
+   * @param filepath {@link String}
    * @throws IOException If file not found or some other IO error occurs.
    */
   public Cover(String filepath) throws IOException {
@@ -154,6 +153,25 @@ public class Cover implements Iterable<Cube> {
 
   public Cube remove(int index) {
     return cubes.remove(index);
+  }
+
+  /**
+   * Removes a {@link Cube} located at the given index.
+   * <p>
+   * WARNING: This method doesn't care about maintaining
+   * an order of {@link Cube}s before and after removal.
+   * It only removes a {@link Cube} with O(1) complexity.
+   *
+   * @param index int
+   * @return removed {@link Cube}
+   */
+  public Cube orderBreakRemove(int index) {
+    if (index == size() - 1) {
+      remove(index);
+    }
+
+    cubes.swapCubes(index, size() - 1);
+    return remove(size() - 1);
   }
 
   public Cube get(int index) {

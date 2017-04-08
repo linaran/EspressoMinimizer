@@ -172,6 +172,16 @@ public class CubeArray implements Iterable<Cube> {
     list.sort(comparator);
   }
 
+  public void swapCubes(int firstIndex, int secondIndex) {
+    if (firstIndex == secondIndex) {
+      return;
+    }
+
+    Cube temp = list.get(firstIndex);
+    list.set(firstIndex, list.get(secondIndex));
+    list.set(secondIndex, temp);
+  }
+
   @Override
   public Iterator<Cube> iterator() {
     return new CubeArrayIterator();
