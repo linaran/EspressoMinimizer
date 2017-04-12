@@ -4,8 +4,8 @@ import espresso.boolFunction.Cover;
 import espresso.boolFunction.InputState;
 import espresso.boolFunction.OutputState;
 import espresso.boolFunction.cube.Cube;
+import espresso.minimizers.espressoMinimizer.utils.BooleanMatrix;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.Iterator;
 
@@ -16,12 +16,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
-public class CubeExpansionMatrixTest {
+public class BooleanMatrixTest {
 
   @Test
   public void columnIteratorWithoutIgnoreTest() throws Exception {
     Cover cover = new Cover("testCase1.txt");
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
 
     int[] actual = new int[matrix.getColumnCount()];
     int[] expected = new int[]{0, 1, 2, 3};
@@ -42,7 +42,7 @@ public class CubeExpansionMatrixTest {
   @Test
   public void columnIteratorWithIgnoreTest() throws Exception {
     Cover cover = new Cover("testCase1.txt");
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
     matrix.addIgnoredColumns(1, 3);
 
     int[] actual = new int[matrix.getColumnCount()];
@@ -64,7 +64,7 @@ public class CubeExpansionMatrixTest {
   @Test
   public void rowIteratorWithoutIgnoreTest() throws Exception {
     Cover cover = new Cover("testCase1.txt");
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
 
     int[] actual = new int[matrix.getRowCount()];
     int[] expected = new int[]{0, 1, 2, 3, 4, 5};
@@ -85,7 +85,7 @@ public class CubeExpansionMatrixTest {
   @Test
   public void rowIteratorWithIgnoreTest() throws Exception {
     Cover cover = new Cover("testCase1.txt");
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cover.get(0));
     matrix.addIgnoredRows(1, 3);
 
     int[] actual = new int[matrix.getRowCount()];
@@ -109,7 +109,7 @@ public class CubeExpansionMatrixTest {
     Cover cover = new Cover("testCase3.txt");
     Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
 
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
     matrix.addIgnoredRows(0, 4);
 
     int expected = 3;
@@ -127,7 +127,7 @@ public class CubeExpansionMatrixTest {
     Cover cover = new Cover("testCase3.txt");
     Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
 
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
     matrix.addIgnoredRows(0, 4);
 
     int expected = 4;
@@ -145,7 +145,7 @@ public class CubeExpansionMatrixTest {
     Cover cover = new Cover("testCase3.txt");
     Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
 
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
     matrix.addIgnoredRows(0, 4);
 
     int expected = 5;
@@ -163,7 +163,7 @@ public class CubeExpansionMatrixTest {
     Cover cover = new Cover("testCase1.txt");
     Cube cube = new Cube(new InputState[]{ZERO, ONE, ZERO, ONE}, new OutputState[]{OUTPUT});
 
-    CubeExpansionMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
+    BooleanMatrix matrix = new SingleOutputCoverMatrix(cover, cube);
     matrix.addIgnoredRows(100);
   }
 }

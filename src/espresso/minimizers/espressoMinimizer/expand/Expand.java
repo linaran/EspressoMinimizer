@@ -1,5 +1,6 @@
 package espresso.minimizers.espressoMinimizer.expand;
 
+import espresso.minimizers.espressoMinimizer.utils.BooleanMatrix;
 import espresso.utils.Pair;
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.cube.Cube;
@@ -39,7 +40,7 @@ final public class Expand {
 
   public static Pair<Cube, List<Integer>> singleOutputCubeExpand(Cube cube, Cover onSet, Cover offSet) {
     clearStatic(); //TODO: Code smell.
-    SingleOutputBlockingMatrix blockMatrix = new SingleOutputBlockingMatrix(offSet, cube);
+    SingleOutputBlockMatrix blockMatrix = new SingleOutputBlockMatrix(offSet, cube);
     SingleOutputCoverMatrix coverMatrix = new SingleOutputCoverMatrix(onSet, cube);
 
     while (loweringSet.size() + raisingSet.size() < blockMatrix.getColumnCount() &&
@@ -114,7 +115,7 @@ final public class Expand {
   }
 
   private static Set<Integer> maximumFeasibleCoveringSet(
-      SingleOutputBlockingMatrix blockMatrix,
+      SingleOutputBlockMatrix blockMatrix,
       SingleOutputCoverMatrix coverMatrix
   ) {
     Set<Set<Integer>> coveringSets = computeFeasibleCoveringSets(
@@ -147,7 +148,7 @@ final public class Expand {
   }
 
   private static Set<Set<Integer>> computeFeasibleCoveringSets(
-      SingleOutputBlockingMatrix blockingMatrix,
+      SingleOutputBlockMatrix blockingMatrix,
       SingleOutputCoverMatrix coverMatrix
   ) {
     Set<Set<Integer>> coveringSets = new HashSet<>();
@@ -169,7 +170,7 @@ final public class Expand {
 
   private static boolean isFeasiblyCovered(
       int coverRowIndex,
-      SingleOutputBlockingMatrix blockMatrix,
+      SingleOutputBlockMatrix blockMatrix,
       SingleOutputCoverMatrix coverMatrix
   ) {
 
@@ -194,7 +195,7 @@ final public class Expand {
     return true;
   }
 
-  private static List<Integer> essentialColumns(SingleOutputBlockingMatrix blockMatrix) {
+  private static List<Integer> essentialColumns(SingleOutputBlockMatrix blockMatrix) {
     List<Integer> retValue = new ArrayList<>();
 
     for (Iterator<Integer> rowIter = blockMatrix.ignoreRowsIterator(); rowIter.hasNext(); ) {
@@ -220,7 +221,7 @@ final public class Expand {
     return retValue;
   }
 
-  private static List<Integer> inessentialColumns(SingleOutputBlockingMatrix matrix) {
+  private static List<Integer> inessentialColumns(SingleOutputBlockMatrix matrix) {
     List<Integer> retValue = new ArrayList<>();
 
     for (Iterator<Integer> iter = matrix.ignoreColumnsIterator(); iter.hasNext(); ) {
@@ -234,7 +235,7 @@ final public class Expand {
     return retValue;
   }
 
-  private static void firstElimination(CubeExpansionMatrix matrix, List<Integer> essentialColumns) {
+  private static void firstElimination(BooleanMatrix matrix, List<Integer> essentialColumns) {
     for (int columnIndex : essentialColumns) {
       if (matrix.isColumnIgnored(columnIndex)) continue;
       matrix.addIgnoredColumns(columnIndex);
@@ -251,7 +252,7 @@ final public class Expand {
 
   //  When something is added to raisingSet.
   private static void secondElimination(
-      SingleOutputBlockingMatrix blockMatrix,
+      SingleOutputBlockMatrix blockMatrix,
       SingleOutputCoverMatrix coverMatrix,
       List<Integer> columns
   ) {

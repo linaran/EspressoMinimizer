@@ -1,14 +1,11 @@
-package espresso.minimizers.espressoMinimizer.expand;
+package espresso.minimizers.espressoMinimizer.utils;
 
 
-import espresso.boolFunction.Cover;
-import espresso.boolFunction.InputState;
-import espresso.boolFunction.cube.Cube;
 import espresso.utils.IgnoreIndexIterator;
 
 import java.util.*;
 
-public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
+public class BooleanMatrix implements Iterable<List<Boolean>> {
 
   private int[] trueColumnCount;
   private int[] trueIgnoreColumnCount;
@@ -18,43 +15,22 @@ public abstract class CubeExpansionMatrix implements Iterable<List<Boolean>> {
 
   private List<List<Boolean>> matrix = new ArrayList<>();
 
-  public CubeExpansionMatrix(Cover cover, Cube cube) {
-    //region Exception Check
-    if (cover.size() == 0) {
-      throw new IllegalArgumentException(
-          "Don't know how to create blocking matrix from an empty offSet."
-      );
-    }
+  public BooleanMatrix(MatrixElementGenerator generator) {
+    trueColumnCount = new int[generator.getColumnCount()];
+    trueIgnoreColumnCount = new int[generator.getColumnCount()];
 
-    if (cover.inputCount() != cube.inputLength()) {
-      throw new IllegalArgumentException(
-          "Input counts for the given cube and cover need to be equal."
-      );
-    }
-    //endregion
-
-    trueColumnCount = new int[cover.get(0).inputLength()];
-    trueIgnoreColumnCount = new int[cover.get(0).inputLength()];
-
-    for (Cube coverCube : cover) {
+    for (int i = 0; i < generator.getRowCount(); i++) {
       List<Boolean> row = new ArrayList<>();
 
-      for (int j = 0; j < coverCube.inputLength(); ++j) {
-        InputState cubeInputState = cube.getInputState(j);
-        InputState coverCubeInputState = coverCube.getInputState(j);
-
-        boolean matrixElement = generateMatrixElement(coverCubeInputState, cubeInputState);
+      for (int j = 0; j < generator.getColumnCount(); j++) {
+        boolean matrixElement = generator.generateElement(i, j);
         trueColumnCount[j] += (matrixElement ? 1 : 0);
         row.add(matrixElement);
       }
 
       matrix.add(row);
     }
-
-//    TODO: Output part loop.
   }
-
-  protected abstract boolean generateMatrixElement(InputState coverInputState, InputState cubeInputState);
 
   @Override
   public Iterator<List<Boolean>> iterator() {

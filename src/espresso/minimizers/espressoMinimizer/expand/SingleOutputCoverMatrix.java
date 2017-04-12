@@ -1,26 +1,17 @@
 package espresso.minimizers.espressoMinimizer.expand;
 
 import espresso.boolFunction.Cover;
-import espresso.boolFunction.InputState;
 import espresso.boolFunction.cube.Cube;
+import espresso.minimizers.espressoMinimizer.utils.BooleanMatrix;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import static espresso.boolFunction.InputState.ONE;
-import static espresso.boolFunction.InputState.ZERO;
-
-public class SingleOutputCoverMatrix extends CubeExpansionMatrix {
+public class SingleOutputCoverMatrix extends BooleanMatrix {
 
   public SingleOutputCoverMatrix(Cover cover, Cube cube) {
-    super(cover, cube);
-  }
-
-  @Override
-  protected boolean generateMatrixElement(InputState coverInputState, InputState cubeInputState) {
-    return cubeInputState == ONE && coverInputState != ONE ||
-        cubeInputState == ZERO && coverInputState != ZERO;
+    super(new CoverMatrixElementGenerator(cover, cube));
   }
 
   public Set<Integer> computeCoveringSet(

@@ -4,7 +4,7 @@ import espresso.boolFunction.Cover;
 import espresso.boolFunction.InputState;
 import espresso.boolFunction.OutputState;
 import espresso.boolFunction.cube.Cube;
-import espresso.minimizers.espressoMinimizer.expand.SingleOutputBlockingMatrix;
+import espresso.minimizers.espressoMinimizer.expand.SingleOutputBlockMatrix;
 import org.junit.Test;
 
 import static espresso.boolFunction.InputState.DONTCARE;
@@ -14,7 +14,7 @@ import static espresso.boolFunction.OutputState.OUTPUT;
 import static org.junit.Assert.*;
 
 
-public class SingleOutputBlockingMatrixTest {
+public class SingleOutputBlockMatrixTest {
 
   @Test
   public void construction() throws Exception {
@@ -25,7 +25,7 @@ public class SingleOutputBlockingMatrixTest {
 
     Cube cube = new Cube(new InputState[]{ZERO, ZERO, DONTCARE}, new OutputState[]{OUTPUT});
 
-    SingleOutputBlockingMatrix matrix = new SingleOutputBlockingMatrix(cover, cube);
+    SingleOutputBlockMatrix matrix = new SingleOutputBlockMatrix(cover, cube);
 
     boolean[][] actualMatrix = new boolean[matrix.getRowCount()][matrix.getColumnCount()];
     for (int i = 0; i < matrix.getRowCount(); i++) {
