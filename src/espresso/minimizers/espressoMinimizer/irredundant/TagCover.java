@@ -10,7 +10,6 @@ import java.util.Collection;
  * Several contracts are enforced here.
  * This {@link TagCover} must contain {@link TagCube}s only.
  * Every {@link TagCube} must have a tag.
- * Every tag should be unique.
  * Tags are propagated through the cofactor and shannonCofactors operation.
  * <p>
  * Warning: Other operations like {@link Cover#intersect(Cover)} may render
@@ -41,12 +40,16 @@ public class TagCover extends Cover {
 
   @Override
   public void addAll(Cover cover) {
-    cover.forEach(this::add);
+    for (Cube cube : cover) {
+      super.add(new TagCube(cube, size()));
+    }
   }
 
   @Override
   public void addAll(Collection<? extends Cube> c) {
-    c.forEach(this::add);
+    for (Cube cube : c) {
+      super.add(new TagCube(cube, size()));
+    }
   }
 
   @Override
