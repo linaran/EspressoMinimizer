@@ -1,9 +1,11 @@
 package espresso.boolFunction;
 
 import espresso.boolFunction.cube.Cube;
+import espresso.utils.Pair;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.List;
 
 import static espresso.boolFunction.InputState.*;
 import static espresso.boolFunction.OutputState.*;
@@ -167,5 +169,31 @@ public class CoverTest {
         expectedPositiveCofactor,
         actualPositiveCofactor
     );
+  }
+
+  @Test
+  public void trackingCofactorTest() throws Exception {
+    Cover cover = new Cover("testCase1.txt");
+    Pair<Cover, List<Integer>> pair =
+        cover.trackingCofactor(cover.generateVariableCube(0));
+
+    Cover expectedCofactor = cover.cofactor(cover.generateVariableCube(0));
+    assertEquals(
+        "Cofactor calculation is wrong.",
+        expectedCofactor,
+        pair.first
+    );
+
+    assertEquals(
+        "Tracking is broken",
+        new Integer(4),
+        pair.second.get(0)
+    );
+    assertEquals(
+        "Tracking is broken",
+        new Integer(5),
+        pair.second.get(1)
+    );
+
   }
 }

@@ -3,13 +3,12 @@ package espresso.boolFunction;
 import espresso.boolFunction.cube.Cube;
 import espresso.boolFunction.cube.CubeArray;
 import espresso.urpAlgorithms.Complement;
+import espresso.utils.Pair;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 import static espresso.boolFunction.InputState.DONTCARE;
 import static espresso.boolFunction.InputState.ONE;
@@ -337,6 +336,25 @@ public class Cover implements Iterable<Cube> {
     }
 
     return retValue;
+  }
+
+  public Pair<Cover, List<Integer>> trackingCofactor(Cube other) {
+    checkCoverCompatibility(Cover.of(other));
+
+    Cover cofactor = new Cover(inputCount(), outputCount());
+    List<Integer> indexTrack = new ArrayList<>();
+
+    for (int i = 0; i < this.size(); ++i) {
+      Cube coverCube = this.get(i);
+      Cube cubeCofactor = coverCube.cofactor(other);
+      
+      if (cubeCofactor != null) {
+        cofactor.add(cubeCofactor);
+        indexTrack.add(i);
+      }
+    }
+
+    return new Pair<>(cofactor, indexTrack);
   }
 
   /**
