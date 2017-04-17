@@ -36,8 +36,8 @@ public class Cover implements Iterable<Cube> {
   public Cover(Cube... cubes) {
     if (cubes == null) throw new NullPointerException("Parameter can't be null.");
     if (cubes.length == 0) {
-      throw new IllegalArgumentException(
-          "At least one cube is needed for this constructor. See Cover#Cover(int, int) as an alternative."
+      throw new UnsupportedOperationException(
+          "This constructor requires at least one cube. See Cover#Cover(int, int) as an alternative."
       );
     }
 
@@ -111,7 +111,7 @@ public class Cover implements Iterable<Cube> {
     return retValue;
   }
 
-  private void checkCoverCompatibility(Cover other) {
+  protected void checkCoverCompatibility(Cover other) {
     if (inputCount() != other.inputCount() || outputCount() != other.outputCount()) {
       throw new UnsupportedOperationException(
           "This operation can't be performed on these two covers. Their input or output counts are different."
@@ -350,11 +350,8 @@ public class Cover implements Iterable<Cube> {
    */
   public boolean hasDONTCARERow() {
     for (Cube cube : this) {
-      for (int i = 0; i < cube.inputLength(); i++) {
-        if (cube.input(i) != DONTCARE)
-          break;
-        if (i + 1 == cube.inputLength())
-          return true;
+      if (cube.isInputPartTautology()) {
+        return true;
       }
     }
     return false;

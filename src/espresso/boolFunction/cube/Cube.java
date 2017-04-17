@@ -555,6 +555,15 @@ public class Cube {
     return true;
   }
 
+  public boolean isInputPartTautology() {
+    int sum = 0;
+    for (InputState inputState : input) {
+      sum += inputState.valueOf();
+    }
+
+    return sum == (DONTCARE.valueOf() * input.length);
+  }
+
   /**
    * A {@link Cube} is regarded empty when one of the input parts
    * is {@link InputState#EMPTY} or all of the output parts are {@link OutputState#NOT_OUTPUT}.

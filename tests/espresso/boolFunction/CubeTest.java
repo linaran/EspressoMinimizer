@@ -31,4 +31,19 @@ public class CubeTest {
         actualComplement.get(1).equals(expectedComplement.get(1))
     );
   }
+
+  @Test
+  public void inputPartIsTautology() throws Exception {
+    Cube tautologyInput = new Cube(new InputState[]{DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
+    assertTrue(
+        "Algorithm said input part isn't tautology which isn't correct.",
+        tautologyInput.isInputPartTautology()
+    );
+
+    Cube notTautologyInput = new Cube(new InputState[]{ONE, DONTCARE, ZERO}, new OutputState[]{OUTPUT});
+    assertTrue(
+        "Algorithm said input part is tautology which isn't correct.",
+        tautologyInput.isInputPartTautology()
+    );
+  }
 }
