@@ -55,9 +55,30 @@ public class Irredundant {
     return partiallyRedundant;
   }
 
-  private static BooleanMatrix calculateAuxiliaryMatrix(Cover alpha, Cover beta) {
-    List<List<Integer>> minSets = calculateMinimalSets(alpha, beta, null);
-    return new NoCoverMatrix(minSets, alpha.size());
+  private static BooleanMatrix calculateNoCoverMatrix(
+      Set<Cube> relativelyEssential,
+      Cover dontCareSet,
+      Set<Cube> partiallyRedundant
+  ) {
+    Cube example = relativelyEssential.iterator().next();
+
+    Cover importantCubes = new Cover(example.inputLength(), example.outputLength());
+    importantCubes.addAll(dontCareSet);
+    importantCubes.addAll(relativelyEssential);
+
+    Cover partRedundantCover = new Cover(example.inputLength(), example.outputLength());
+    partRedundantCover.addAll(partiallyRedundant);
+
+    List<List<Integer>> minSets = new ArrayList<>();
+    for (Cube partiallyRedundantCube : partiallyRedundant) {
+      Cover beta = importantCubes.cofactor(partiallyRedundantCube);
+      Pair<Cover, List<Integer>> alphaPair =
+          partRedundantCover.trackingCofactor(partiallyRedundantCube);
+
+      minSets.addAll(calculateMinimalSets(alphaPair.first, beta, alphaPair.second));
+    }
+
+    return new NoCoverMatrix(minSets, partRedundantCover.size());
   }
 
   private static List<List<Integer>> calculateMinimalSets(
