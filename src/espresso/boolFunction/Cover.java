@@ -359,7 +359,7 @@ public class Cover implements Iterable<Cube> {
 
       if (cubeCofactor != null) {
         cofactor.add(cubeCofactor);
-        int index = previousTrack != null ? previousTrack.get(i) : i;
+        int index = (previousTrack != null ? previousTrack.get(i) : i);
         indexTrack.add(index);
       }
     }
