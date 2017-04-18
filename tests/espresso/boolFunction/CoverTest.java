@@ -172,7 +172,7 @@ public class CoverTest {
   }
 
   @Test
-  public void trackingCofactorTest() throws Exception {
+  public void shallowTrackingCofactorTest() throws Exception {
     Cover cover = new Cover("testCase1.txt");
     Pair<Cover, List<Integer>> pair =
         cover.trackingCofactor(cover.generateVariableCube(0));
@@ -195,5 +195,24 @@ public class CoverTest {
         pair.second.get(1)
     );
 
+  }
+
+  @Test
+  public void deepTrackingCofactorTest() throws Exception {
+    Cover cover = new Cover("testCase1.txt");
+    Pair<Cover, List<Integer>> pair =
+        cover.trackingCofactor(cover.generateVariableCube(1));
+    Pair<Cover, List<Integer>> nextPair =
+        pair.first.trackingCofactor(pair.first.generateVariableCube(0), pair.second);
+
+    assertEquals(
+        "Deep tracking is broken.",
+        new Integer(4),
+        nextPair.second.get(0)
+    );
+    assertEquals(
+        new Integer(5),
+        nextPair.second.get(1)
+    );
   }
 }

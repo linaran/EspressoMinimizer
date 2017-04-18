@@ -339,7 +339,16 @@ public class Cover implements Iterable<Cube> {
   }
 
   public Pair<Cover, List<Integer>> trackingCofactor(Cube other) {
+    return trackingCofactor(other, null);
+  }
+
+  public Pair<Cover, List<Integer>> trackingCofactor(Cube other, List<Integer> previousTrack) {
     checkCoverCompatibility(Cover.of(other));
+    if (previousTrack != null && previousTrack.size() != size()) {
+      throw new IllegalArgumentException(
+          "Previous tracker should be the same size as the current cover."
+      );
+    }
 
     Cover cofactor = new Cover(inputCount(), outputCount());
     List<Integer> indexTrack = new ArrayList<>();
@@ -347,10 +356,11 @@ public class Cover implements Iterable<Cube> {
     for (int i = 0; i < this.size(); ++i) {
       Cube coverCube = this.get(i);
       Cube cubeCofactor = coverCube.cofactor(other);
-      
+
       if (cubeCofactor != null) {
         cofactor.add(cubeCofactor);
-        indexTrack.add(i);
+        int index = previousTrack != null ? previousTrack.get(i) : i;
+        indexTrack.add(index);
       }
     }
 
