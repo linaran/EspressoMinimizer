@@ -8,7 +8,7 @@ import espresso.minimizers.espressoMinimizer.utils.MatrixElementGenerator;
 import java.util.Collections;
 import java.util.List;
 
-public class AuxiliaryMatrixElementGenerator implements MatrixElementGenerator {
+public class NoCoverMatrixElementGenerator implements MatrixElementGenerator {
 
   private int columnCount;
   private List<List<Integer>> minSets;
@@ -18,7 +18,7 @@ public class AuxiliaryMatrixElementGenerator implements MatrixElementGenerator {
    * These lists are expected to be tracking data calculated from
    * {@link Cover#trackingCofactor(Cube, List)}.
    */
-  public AuxiliaryMatrixElementGenerator(List<List<Integer>> minSets, int columnCount) {
+  public NoCoverMatrixElementGenerator(List<List<Integer>> minSets, int columnCount) {
     this.columnCount = columnCount;
     this.minSets = minSets;
   }

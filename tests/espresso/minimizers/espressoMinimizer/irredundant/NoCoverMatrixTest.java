@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class AuxiliaryMatrixTest {
+public class NoCoverMatrixTest {
 
   @Test
   public void construction() throws Exception {
@@ -19,7 +19,7 @@ public class AuxiliaryMatrixTest {
     minSets.add(Arrays.asList(0, 4, 5));
 
     int columnCount = 6;
-    BooleanMatrix matrix = new AuxiliaryMatrix(minSets, columnCount);
+    BooleanMatrix matrix = new NoCoverMatrix(minSets, columnCount);
 
     for (int i = 0; i < minSets.size(); i++) {
       for (int j = 0; j < columnCount; j++) {
