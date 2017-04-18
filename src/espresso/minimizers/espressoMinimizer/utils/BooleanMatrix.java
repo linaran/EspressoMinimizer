@@ -4,6 +4,7 @@ package espresso.minimizers.espressoMinimizer.utils;
 import espresso.utils.IgnoreIndexIterator;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class BooleanMatrix implements Iterable<List<Boolean>> {
 
@@ -149,9 +150,21 @@ public class BooleanMatrix implements Iterable<List<Boolean>> {
   }
 
   public int getTrueRowCount(int rowIndex) {
+    return getTrueRowCount(rowIndex, true);
+  }
+
+  public int getTrueRowCount(int rowIndex, boolean countIgnoredValues) {
     int retValue = 0;
 
-    for (int columnIndex = 0; columnIndex < getColumnCount(); columnIndex++) {
+    Iterator<Integer> iter;
+    if (!countIgnoredValues) {
+      iter = new IgnoreIndexIterator(getColumnCount(), ignoredColumns);
+    } else {
+      iter = new IgnoreIndexIterator(getColumnCount(), new HashSet<>());
+    }
+
+    for (; iter.hasNext(); ) {
+      int columnIndex = iter.next();
       retValue += (getElement(rowIndex, columnIndex) ? 1 : 0);
     }
 
@@ -161,6 +174,8 @@ public class BooleanMatrix implements Iterable<List<Boolean>> {
   public int getFalseRowCount(int rowIndex) {
     return getColumnCount() - getTrueColumnCount(rowIndex);
   }
+
+//  TODO: getFalseRowCount(int rowIndex, boolean countIgnoredValues){}
 
   public boolean getElement(int i, int j) {
     return matrix.get(i).get(j);

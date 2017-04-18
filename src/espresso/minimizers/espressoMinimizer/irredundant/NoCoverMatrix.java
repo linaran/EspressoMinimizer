@@ -25,7 +25,7 @@ public class NoCoverMatrix extends BooleanMatrix {
     }
   }
 
-  public boolean isSecondRowRedundant(int firstRow, int secondRow) {
+  private boolean isSecondRowRedundant(int firstRow, int secondRow) {
     for (Iterator<Integer> iter1 = ignoreColumnsIterator(); iter1.hasNext(); ) {
       int columnIndex = iter1.next();
 

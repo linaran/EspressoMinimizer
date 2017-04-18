@@ -42,14 +42,14 @@ public class IndependencyMatrix extends BooleanMatrix {
     return getElement(node1, node2);
   }
 
-  public int rowIndexWithMaxTrueCount() {
+  private int rowIndexWithMaxTrueCount() {
     int maxRowIndex = 0;
     int maxTrueCount = 0;
 
     for (Iterator<Integer> iter = ignoreRowsIterator(); iter.hasNext(); ) {
       int rowIndex = iter.next();
 
-      int trueRowCount = getTrueRowCount(rowIndex);
+      int trueRowCount = getTrueRowCount(rowIndex, false);
       if (trueRowCount > maxTrueCount) {
         maxRowIndex = rowIndex;
         maxTrueCount = trueRowCount;
