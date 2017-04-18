@@ -57,7 +57,7 @@ public class Irredundant {
 
   private static BooleanMatrix calculateAuxiliaryMatrix(Cover alpha, Cover beta) {
     List<List<Integer>> minSets = calculateMinimalSets(alpha, beta, null);
-    return new AuxiliaryMatrix(minSets, alpha.size());
+    return new NoCoverMatrix(minSets, alpha.size());
   }
 
   private static List<List<Integer>> calculateMinimalSets(
