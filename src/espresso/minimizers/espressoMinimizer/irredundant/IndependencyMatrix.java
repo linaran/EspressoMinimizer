@@ -20,6 +20,8 @@ public class IndependencyMatrix extends BooleanMatrix {
 
     for (Iterator<Integer> iter = ignoreRowsIterator(); iter.hasNext(); ) {
       int row = iter.next();
+      if (row == startingNode) continue;
+
       if (willMaintainCompleteness(clique, row)) {
         clique.add(row);
       }
