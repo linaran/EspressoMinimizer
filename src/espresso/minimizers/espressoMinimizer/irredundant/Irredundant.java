@@ -12,12 +12,28 @@ import static espresso.urpAlgorithms.Tautology.singleOutputTautologyCheck;
 
 public class Irredundant {
 
-  private Irredundant() {
+  private Irredundant(Cover onSet, Cover dontcareSet) {
   }
 
-  private static Pair<Set<Cube>, Set<Cube>> partitionRedundancy(Cover onSet, Cover dontcareSet) {
-    Set<Cube> relativelyEssential = new HashSet<>();
-    Set<Cube> redundant = new HashSet<>();
+  public Cover IrredundantCover(Cover onSet, Cover dontcareSet) {
+    Pair<List<Cube>, List<Cube>> partitions = partitionRedundancy(onSet, dontcareSet);
+    List<Cube> relativelyEssential = partitions.first;
+    List<Cube> redundant = partitions.second;
+
+    List<Cube> partiallyRedundant = partiallyRedundant(redundant, relativelyEssential, dontcareSet);
+
+    List<Cube> minimalSubset = minimalIrredundant(partiallyRedundant, relativelyEssential, dontcareSet);
+
+    Cover cover = new Cover(onSet.inputCount(), onSet.outputCount());
+    cover.addAll(relativelyEssential);
+    cover.addAll(minimalSubset);
+
+    return cover;
+  }
+
+  private static Pair<List<Cube>, List<Cube>> partitionRedundancy(Cover onSet, Cover dontcareSet) {
+    List<Cube> relativelyEssential = new ArrayList<>();
+    List<Cube> redundant = new ArrayList<>();
 
     Cover unionSet = onSet.union(dontcareSet);
 
@@ -36,12 +52,12 @@ public class Irredundant {
     return new Pair<>(relativelyEssential, redundant);
   }
 
-  private static Set<Cube> partiallyRedundant(
-      Set<Cube> redundant,
-      Set<Cube> relativelyEssential,
+  private static List<Cube> partiallyRedundant(
+      List<Cube> redundant,
+      List<Cube> relativelyEssential,
       Cover dontcareSet
   ) {
-    Set<Cube> partiallyRedundant = new HashSet<>();
+    List<Cube> partiallyRedundant = new ArrayList<>();
 
     Cover unionSet = new Cover(dontcareSet);
     unionSet.addAll(relativelyEssential);
@@ -53,6 +69,24 @@ public class Irredundant {
     }
 
     return partiallyRedundant;
+  }
+
+  private static List<Cube> minimalIrredundant(
+      List<Cube> partiallyRedundant,
+      List<Cube> relativelyEssential,
+      Cover dontcareSet
+  ) {
+    NoCoverMatrix noCoverMatrix =
+        calculateNoCoverMatrix(relativelyEssential, dontcareSet, partiallyRedundant);
+
+    Set<Integer> minColumnCover = minimumColumnCover(noCoverMatrix);
+
+    List<Cube> retValue = new ArrayList<>();
+    for (Integer index : minColumnCover) {
+      retValue.add(partiallyRedundant.get(index));
+    }
+
+    return retValue;
   }
 
   private static Set<Integer> minimumColumnCover(NoCoverMatrix noCoverMatrix) {
@@ -136,9 +170,9 @@ public class Irredundant {
   }
 
   private static NoCoverMatrix calculateNoCoverMatrix(
-      Set<Cube> relativelyEssential,
+      List<Cube> relativelyEssential,
       Cover dontCareSet,
-      Set<Cube> partiallyRedundant
+      List<Cube> partiallyRedundant
   ) {
     Cube example = relativelyEssential.iterator().next();
 
