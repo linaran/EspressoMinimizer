@@ -5,5 +5,8 @@
 Scrap/
 .classpath
 .project
-EspressoMinimizer.*
+EspressoMinimizer.eml
+EspressoMinimizer.iml
+EspressoMinimizer.userlibraries
+EspressoMinimizer.zip
 TODO.txt
