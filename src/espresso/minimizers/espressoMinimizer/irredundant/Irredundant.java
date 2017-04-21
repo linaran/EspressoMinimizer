@@ -3,7 +3,6 @@ package espresso.minimizers.espressoMinimizer.irredundant;
 
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.cube.Cube;
-import espresso.minimizers.espressoMinimizer.utils.BooleanMatrix;
 import espresso.utils.Pair;
 
 import java.util.*;
@@ -15,20 +14,26 @@ public class Irredundant {
   private Irredundant(Cover onSet, Cover dontcareSet) {
   }
 
-  public Cover IrredundantCover(Cover onSet, Cover dontcareSet) {
+  public static Cover irredundantCover(Cover onSet, Cover dontcareSet) {
+    Cover retValue = new Cover(onSet.inputCount(), onSet.outputCount());
+
     Pair<List<Cube>, List<Cube>> partitions = partitionRedundancy(onSet, dontcareSet);
     List<Cube> relativelyEssential = partitions.first;
     List<Cube> redundant = partitions.second;
 
     List<Cube> partiallyRedundant = partiallyRedundant(redundant, relativelyEssential, dontcareSet);
 
+    if (partiallyRedundant.isEmpty()) {
+      retValue.addAll(relativelyEssential);
+      return retValue;
+    }
+
     List<Cube> minimalSubset = minimalIrredundant(partiallyRedundant, relativelyEssential, dontcareSet);
 
-    Cover cover = new Cover(onSet.inputCount(), onSet.outputCount());
-    cover.addAll(relativelyEssential);
-    cover.addAll(minimalSubset);
+    retValue.addAll(relativelyEssential);
+    retValue.addAll(minimalSubset);
 
-    return cover;
+    return retValue;
   }
 
   private static Pair<List<Cube>, List<Cube>> partitionRedundancy(Cover onSet, Cover dontcareSet) {
@@ -38,15 +43,14 @@ public class Irredundant {
     Cover unionSet = onSet.union(dontcareSet);
 
     for (Cube cube : unionSet) {
-      unionSet.remove(cube);
+      Cover copySet = new Cover(unionSet);
+      copySet.remove(cube);
 
-      if (singleOutputTautologyCheck(unionSet.cofactor(cube))) {
+      if (singleOutputTautologyCheck(copySet.cofactor(cube))) {
         redundant.add(cube.copy());
       } else {
         relativelyEssential.add(cube.copy());
       }
-
-      unionSet.add(cube);
     }
 
     return new Pair<>(relativelyEssential, redundant);
@@ -63,7 +67,7 @@ public class Irredundant {
     unionSet.addAll(relativelyEssential);
 
     for (Cube cube : redundant) {
-      if (singleOutputTautologyCheck(unionSet.cofactor(cube))) {
+      if (!singleOutputTautologyCheck(unionSet.cofactor(cube))) {
         partiallyRedundant.add(cube.copy());
       }
     }
@@ -174,6 +178,12 @@ public class Irredundant {
       Cover dontCareSet,
       List<Cube> partiallyRedundant
   ) {
+    if (partiallyRedundant.isEmpty()) {
+      throw new UnsupportedOperationException(
+          "Without partially redundant cubes a no cover matrix can't be calculated."
+      );
+    }
+
     Cube example = relativelyEssential.iterator().next();
 
     Cover importantCubes = new Cover(example.inputLength(), example.outputLength());
@@ -186,6 +196,7 @@ public class Irredundant {
     List<List<Integer>> minSets = new ArrayList<>();
     for (Cube partiallyRedundantCube : partiallyRedundant) {
       Cover beta = importantCubes.cofactor(partiallyRedundantCube);
+
       Pair<Cover, List<Integer>> alphaPair =
           partRedundantCover.trackingCofactor(partiallyRedundantCube);
 
@@ -195,7 +206,7 @@ public class Irredundant {
     return new NoCoverMatrix(minSets, partRedundantCover.size());
   }
 
-  private static List<List<Integer>> calculateMinimalSets(
+  public static List<List<Integer>> calculateMinimalSets(
       Cover alpha,
       Cover beta,
       List<Integer> alphaTrack
@@ -231,7 +242,7 @@ public class Irredundant {
       List<List<Integer>> positiveSets =
           calculateMinimalSets(positiveAlphaPair.first, positiveBetaCofactor, positiveAlphaPair.second);
       List<List<Integer>> negativeSets =
-          calculateMinimalSets(negativeAlphaPair.first, negativeBetaCofactor, positiveAlphaPair.second);
+          calculateMinimalSets(negativeAlphaPair.first, negativeBetaCofactor, negativeAlphaPair.second);
 
       List<List<Integer>> mergedSets = new ArrayList<>();
       mergedSets.addAll(positiveSets);

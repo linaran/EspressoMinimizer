@@ -326,7 +326,7 @@ public class Cover implements Iterable<Cube> {
    * @return {@link Cover}.
    */
   public Cover cofactor(Cube other) {
-    checkCoverCompatibility(Cover.of(other));
+    checkCoverCompatibility(Cover.of(other.copy()));
     Cover retValue = new Cover(inputCount(), outputCount());
 
     for (Cube cube : cubes) {
@@ -398,6 +398,11 @@ public class Cover implements Iterable<Cube> {
     } else {
       return Complement.complement(this, new Cover(inputCount(), outputCount()));
     }
+  }
+
+  public Cover complement(Cover dontcareSet) {
+    checkCoverCompatibility(dontcareSet);
+    return Complement.complement(this, dontcareSet);
   }
 
   /**

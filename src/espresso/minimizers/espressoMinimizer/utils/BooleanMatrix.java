@@ -17,6 +17,10 @@ public class BooleanMatrix implements Iterable<List<Boolean>> {
   private List<List<Boolean>> matrix = new ArrayList<>();
 
   public BooleanMatrix(MatrixElementGenerator generator) {
+    if (generator.getRowCount() == 0 || generator.getColumnCount() == 0) {
+      throw new UnsupportedOperationException("Can't create a boolean matrix with 0 columns or rows");
+    }
+
     trueColumnCount = new int[generator.getColumnCount()];
     trueIgnoreColumnCount = new int[generator.getColumnCount()];
 
