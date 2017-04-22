@@ -265,11 +265,13 @@ public class Cover implements Iterable<Cube> {
       throw new UnsupportedOperationException("Cube is empty!");
 
     int variableCount = cubes.getInputLength();
+
+    if (isUnate()) {
+      return binateSelectUnateCase();
+    }
+
     int maxSum = -1;
     int maxIndex = -2;
-
-    if (isUnate())
-      return -1;
 
     for (int i = 0; i < variableCount; i++) {
       int zeroColumnCount = getZeroColumnCount(i);
@@ -286,6 +288,20 @@ public class Cover implements Iterable<Cube> {
     }
 
     return maxIndex;
+  }
+
+  private int binateSelectUnateCase() {
+    int variableCount = cubes.getInputLength();
+
+    for (int i = 0; i < variableCount; i++) {
+      if (getZeroColumnCount(i) != 0 || getOneColumnCount(i) != 0) {
+        return i;
+      }
+    }
+
+    throw new UnsupportedOperationException(
+        "Input parts of the given cover contain only dontcare values. Binate selection can't be performed."
+    );
   }
 
   /**
