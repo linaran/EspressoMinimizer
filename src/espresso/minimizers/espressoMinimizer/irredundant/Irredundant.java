@@ -211,6 +211,12 @@ public class Irredundant {
       Cover beta,
       List<Integer> alphaTrack
   ) {
+    if (alpha.size() == 0) {
+      throw new IllegalArgumentException(
+          "Minimal sets can't be calculated from an empty alpha."
+      );
+    }
+
     Cover alphaBetaUnion = alpha.union(beta);
 
     if (alphaBetaUnion.isUnate()) {
