@@ -18,7 +18,7 @@ public class NoCoverMatrix extends BooleanMatrix {
       for (Iterator<Integer> iter2 = ignoreRowsIterator(); iter2.hasNext(); ) {
         int rowIndex2 = iter2.next();
 
-        if (isSecondRowRedundant(rowIndex1, rowIndex2)) {
+        if (rowIndex1 != rowIndex2 && isSecondRowRedundant(rowIndex1, rowIndex2)) {
           addIgnoredRows(rowIndex2);
         }
       }
@@ -26,6 +26,12 @@ public class NoCoverMatrix extends BooleanMatrix {
   }
 
   private boolean isSecondRowRedundant(int firstRow, int secondRow) {
+    if (getTrueRowCount(firstRow) == 0 || getTrueRowCount(secondRow) == 0) {
+      throw new IllegalArgumentException(
+          "Boolean rows containing only false values are not allowed."
+      );
+    }
+
     for (Iterator<Integer> iter1 = ignoreColumnsIterator(); iter1.hasNext(); ) {
       int columnIndex = iter1.next();
 

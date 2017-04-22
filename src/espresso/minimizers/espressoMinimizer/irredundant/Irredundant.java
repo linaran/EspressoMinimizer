@@ -245,10 +245,21 @@ public class Irredundant {
           calculateMinimalSets(negativeAlphaPair.first, negativeBetaCofactor, negativeAlphaPair.second);
 
       List<List<Integer>> mergedSets = new ArrayList<>();
-      mergedSets.addAll(positiveSets);
-      mergedSets.addAll(negativeSets);
+      addAllIgnoringEmptyLists(mergedSets, positiveSets);
+      addAllIgnoringEmptyLists(mergedSets, negativeSets);
 
       return mergedSets;
+    }
+  }
+
+  private static void addAllIgnoringEmptyLists(
+      List<List<Integer>> container,
+      List<List<Integer>> sets
+  ) {
+    for (List<Integer> set : sets) {
+      if (!set.isEmpty()) {
+        container.add(set);
+      }
     }
   }
 
