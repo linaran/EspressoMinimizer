@@ -4,9 +4,10 @@ package espresso.minimizers.espressoMinimizer;
 import espresso.boolFunction.Cover;
 import espresso.minimizers.espressoMinimizer.expand.Expand;
 import espresso.minimizers.espressoMinimizer.irredundant.Irredundant;
-import espresso.minimizers.minimizerInterface.BooleanMinimizer;
+import espresso.minimizers.minimizerInterface.BooleanOnSetDontCareMinimizer;
+import espresso.minimizers.minimizerInterface.BooleanOnSetMinimizer;
 
-public class EspressoMinimizer extends BooleanMinimizer {
+public class EspressoMinimizer implements BooleanOnSetDontCareMinimizer, BooleanOnSetMinimizer {
   private static EspressoMinimizer instance = new EspressoMinimizer();
 
   public static EspressoMinimizer getInstance() {
@@ -17,13 +18,16 @@ public class EspressoMinimizer extends BooleanMinimizer {
   }
 
   @Override
-  public Cover onSetDontcareMinimization(Cover onSet, Cover dontcareSet) {
+  public Cover minimize(Cover onSet, Cover dontcareSet) {
     Cover offSet = onSet.complement(dontcareSet);
 
     Cover expandedOnSet = Expand.expandCover(onSet, offSet);
 
-    Cover irredundantSet = Irredundant.irredundantCover(expandedOnSet, dontcareSet);
+    return Irredundant.irredundantCover(expandedOnSet, dontcareSet);
+  }
 
-    return irredundantSet;
+  @Override
+  public Cover minimize(Cover onSet) {
+    return minimize(onSet, new Cover(onSet.inputCount(), onSet.outputCount()));
   }
 }

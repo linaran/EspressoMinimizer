@@ -1,9 +1,9 @@
 package espresso.minimizers;
 
 import espresso.boolFunction.Cover;
-import espresso.minimizers.minimizerInterface.BooleanMinimizer;
+import espresso.minimizers.minimizerInterface.BooleanOnSetMinimizer;
 
-final public class Simplify extends BooleanMinimizer {
+final public class Simplify implements BooleanOnSetMinimizer {
   private static Simplify instance = new Simplify();
 
   public static Simplify getInstance() {
@@ -14,7 +14,7 @@ final public class Simplify extends BooleanMinimizer {
   }
 
   @Override
-  public Cover onSetMinimization(Cover cover) {
+  public Cover minimize(Cover cover) {
     if (cover.size() == 0) {
       return cover;
     }
@@ -28,8 +28,8 @@ final public class Simplify extends BooleanMinimizer {
     Cover[] cofactors = cover.shannonCofactors(splitIndex);
 
     Cover newCover = CoverUtility.mergeWithContainment(
-        onSetMinimization(cofactors[0]),
-        onSetMinimization(cofactors[1]),
+        minimize(cofactors[0]),
+        minimize(cofactors[1]),
         splitIndex,
         true
     );
