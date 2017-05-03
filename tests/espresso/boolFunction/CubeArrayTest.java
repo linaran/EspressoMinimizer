@@ -160,4 +160,37 @@ public class CubeArrayTest {
     Cube wrongCube = new Cube(new InputState[]{ONE}, new OutputState[]{OUTPUT});
     cubes.add(wrongCube);
   }
+
+  @Test
+  public void setMethodShouldAdjustCountersProperly() throws Exception {
+    Cube cube1 = new Cube(new InputState[]{ZERO, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT});
+    CubeArray cubes = new CubeArray(3, 1);
+    cubes.add(cube1);
+
+    Cube cube2 = new Cube(new InputState[]{ONE, ONE, ONE}, new OutputState[]{OUTPUT});
+
+    assertEquals(
+        "Counter maintenance is broken.",
+        1,
+        cubes.getZeroColumnCount(0)
+    );
+    assertEquals(
+        "Counter maintenance is broken.",
+        0,
+        cubes.getOneColumnCount(0)
+    );
+
+    cubes.set(0, cube2);
+
+    assertEquals(
+        "Set method doesn't adjust counters properly.",
+        0,
+        cubes.getZeroColumnCount(0)
+    );
+    assertEquals(
+        "Set method doesn't adjust counters properly.",
+        1,
+        cubes.getOneColumnCount(0)
+    );
+  }
 }

@@ -159,6 +159,14 @@ public class Cover implements Iterable<Cube> {
     return cubes.remove(index);
   }
 
+  public void set(int index, Cube cube) {
+    if (index < 0 || index >= size()) {
+      throw new ArrayIndexOutOfBoundsException("Index is out of bounds.");
+    }
+
+    cubes.set(index, cube);
+  }
+
   public Cube get(int index) {
     return cubes.get(index);
   }

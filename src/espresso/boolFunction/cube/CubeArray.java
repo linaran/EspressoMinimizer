@@ -168,6 +168,16 @@ public class CubeArray implements Iterable<Cube> {
     }
   }
 
+  public void set(int index, Cube cube) {
+    validateCube(cube);
+
+    Cube removedCube = list.get(index);
+    decreaseCounters(removedCube);
+
+    list.set(index, cube);
+    increaseCounters(cube);
+  }
+
   public void sort(Comparator<Cube> comparator) {
     list.sort(comparator);
   }
