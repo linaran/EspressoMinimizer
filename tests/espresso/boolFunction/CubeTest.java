@@ -46,4 +46,27 @@ public class CubeTest {
         tautologyInput.isInputPartTautology()
     );
   }
+
+  @Test
+  public void InputStateCountTest() throws Exception {
+    Cube cube = new Cube(new InputState[]{ONE, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT, NOT_OUTPUT});
+
+    assertEquals(
+        "Incorrect ONE count.",
+        1,
+        cube.oneCount()
+    );
+
+    assertEquals(
+        "Incorrect ZERO count.",
+        0,
+        cube.zeroCount()
+    );
+
+    assertEquals(
+        "Incorrect DONTCARE count.",
+        2,
+        cube.dontcareCount()
+    );
+  }
 }

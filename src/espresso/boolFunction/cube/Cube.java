@@ -38,6 +38,10 @@ public class Cube {
    * @param outputCount primitive int.
    */
   public Cube(int inputCount, int outputCount) {
+    if (inputCount <= 0 || outputCount <= 0) {
+      throw new IllegalArgumentException("Input or output count can't be zero or negative.");
+    }
+
     input = new InputState[inputCount];
     output = new OutputState[outputCount];
 
@@ -284,6 +288,30 @@ public class Cube {
    */
   boolean isBitCountTaken() {
     return bitCount != null;
+  }
+
+  public int oneCount() {
+    return count(ONE);
+  }
+
+  public int zeroCount() {
+    return count(ZERO);
+  }
+
+  public int dontcareCount() {
+    return count(DONTCARE);
+  }
+
+  private int count(InputState inputState) {
+    int retValue = 0;
+
+    for (int i = 0; i < inputLength(); i++) {
+      if (input[i] == inputState) {
+        retValue++;
+      }
+    }
+
+    return retValue;
   }
 
   /**

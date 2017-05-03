@@ -116,19 +116,10 @@ final public class UnateOperations {
     int maxCount = 0;
 
     for (Cube cube : cover) {
-      if (dontcareCount(cube) > maxCount)
+      if (cube.dontcareCount() > maxCount)
         retValue = cube;
     }
 
-    return retValue;
-  }
-
-  private static int dontcareCount(Cube cube) {
-    int retValue = 0;
-    for (int i = 0; i < cube.inputLength(); i++) {
-      if (cube.input(i) == DONTCARE)
-        retValue++;
-    }
     return retValue;
   }
 }
