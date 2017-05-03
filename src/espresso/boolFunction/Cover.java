@@ -159,16 +159,26 @@ public class Cover implements Iterable<Cube> {
     return cubes.remove(index);
   }
 
-  public void set(int index, Cube cube) {
-    if (index < 0 || index >= size()) {
-      throw new ArrayIndexOutOfBoundsException("Index is out of bounds.");
-    }
+  public Cube get(int index) {
+    return cubes.get(index);
+  }
 
+  private void indexOutOfBoundCheck(int index) {
+    if (index < 0 || index >= size()) {
+      throw new ArrayIndexOutOfBoundsException("Index out of bounds.");
+    }
+  }
+
+  public void set(int index, Cube cube) {
+    indexOutOfBoundCheck(index);
     cubes.set(index, cube);
   }
 
-  public Cube get(int index) {
-    return cubes.get(index);
+  public void swapCubes(int index1, int index2) {
+    indexOutOfBoundCheck(index1);
+    indexOutOfBoundCheck(index2);
+
+    cubes.swapCubes(index1, index2);
   }
 
   /**

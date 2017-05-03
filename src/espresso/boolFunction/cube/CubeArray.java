@@ -178,6 +178,12 @@ public class CubeArray implements Iterable<Cube> {
     increaseCounters(cube);
   }
 
+  public void swapCubes(int index1, int index2) {
+    Cube token = list.get(index1);
+    list.set(index1, list.get(index2));
+    list.set(index2, token);
+  }
+
   public void sort(Comparator<Cube> comparator) {
     list.sort(comparator);
   }

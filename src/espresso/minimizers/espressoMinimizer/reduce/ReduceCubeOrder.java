@@ -32,12 +32,6 @@ public class ReduceCubeOrder {
     return new Pair<>(maxCubeIndex, maxCube);
   }
 
-  private void setMaxCubeAsFirst(Cover cover, int index) {
-    Cube token = cover.get(index);
-    cover.set(index, cover.get(0).copy());
-    cover.set(0, token);
-  }
-
   /**
    * Warning: In place organization.
    *
@@ -48,7 +42,7 @@ public class ReduceCubeOrder {
     Integer maxCubeIndex = pair.first;
     Cube maxCube = pair.second;
 
-    setMaxCubeAsFirst(cover, maxCubeIndex);
+    cover.swapCubes(maxCubeIndex, 0);
 
     cover.sort(new MaxCubeDistanceComparator(maxCube));
   }
