@@ -7,7 +7,7 @@ import espresso.boolFunction.cube.Cube;
 
 import java.util.*;
 
-final public class Expand {
+public final class Expand {
 
   private static HashSet<Integer> loweringSet = new HashSet<>();
   private static HashSet<Integer> raisingSet = new HashSet<>();

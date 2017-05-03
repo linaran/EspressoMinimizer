@@ -9,7 +9,7 @@ import java.util.*;
 
 import static espresso.urpAlgorithms.Tautology.singleOutputTautologyCheck;
 
-public class Irredundant {
+final public class Irredundant {
 
   private Irredundant(Cover onSet, Cover dontcareSet) {
   }
