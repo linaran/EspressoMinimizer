@@ -25,6 +25,12 @@ public enum InputState {
       {ZERO, ONE, DONTCARE}
   };
 
+  private static final InputState[][] unionInputMatrix = new InputState[][]{
+      {ZERO, DONTCARE, DONTCARE},
+      {DONTCARE, ONE, DONTCARE},
+      {DONTCARE, DONTCARE, DONTCARE}
+  };
+
   public int valueOf() {
     return numState;
   }
@@ -59,6 +65,14 @@ public enum InputState {
       throw new IllegalArgumentException("One of the input states are empty.");
 
     return andInputMatrix[o1.valueOf()][o2.valueOf()];
+  }
+
+  public static InputState union(InputState o1, InputState o2) {
+    if (o1 == EMPTY || o2 == EMPTY) {
+      throw new IllegalArgumentException("One of the input states are empty.");
+    }
+
+    return unionInputMatrix[o1.valueOf()][o2.valueOf()];
   }
 
   /**

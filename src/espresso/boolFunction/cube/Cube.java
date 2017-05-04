@@ -351,7 +351,7 @@ public class Cube {
    */
   public Cube and(Cube other, boolean returnEmpty) {
     if (input.length != other.input.length || output.length != other.output.length)
-      throw new IllegalArgumentException("Cube lengths are not compatible.");
+      throw new UnsupportedOperationException("Cube lengths are not compatible.");
 
     InputState[] inputStates = new InputState[input.length];
     OutputState[] outputStates = new OutputState[output.length];
@@ -381,6 +381,32 @@ public class Cube {
    */
   public Cube and(Cube other) {
     return and(other, false);
+  }
+
+  /**
+   * Warning: This function is not used in {@link Cover#union(Cover)}.
+   * This is a coordinatewise union.
+   *
+   * @param other {@link Cube}
+   * @return {@link Cube}
+   */
+  public Cube union(Cube other) {
+    if (input.length != other.input.length || output.length != other.output.length) {
+      throw new UnsupportedOperationException("Cube lengths are not compatible.");
+    }
+
+    InputState[] inputStates = new InputState[input.length];
+    OutputState[] outputStates = new OutputState[output.length];
+
+    for (int i = 0; i < inputStates.length; i++) {
+      inputStates[i] = InputState.union(input[i], other.input[i]);
+    }
+
+    for (int i = 0; i < outputStates.length; i++) {
+      outputStates[i] = OutputState.union(output[i], other.output[i]);
+    }
+
+    return new Cube(inputStates, outputStates);
   }
 
   /**

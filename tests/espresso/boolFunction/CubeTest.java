@@ -69,4 +69,19 @@ public class CubeTest {
         cube.dontcareCount()
     );
   }
+
+  @Test
+  public void unionTest() throws Exception {
+    Cube cube1 = new Cube(new InputState[]{ZERO, ONE, DONTCARE, ONE}, new OutputState[]{NOT_OUTPUT, OUTPUT, NOT_OUTPUT});
+    Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE, ZERO}, new OutputState[]{OUTPUT, NOT_OUTPUT, OUTPUT});
+
+    Cube expected = new Cube(new InputState[]{DONTCARE, ONE, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT, OUTPUT});
+    Cube actual = cube1.union(cube2);
+
+    assertEquals(
+        "Union calculation for cubes is wrong.",
+        expected,
+        actual
+    );
+  }
 }

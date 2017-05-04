@@ -22,6 +22,11 @@ public enum OutputState {
       {NOT_OUTPUT, OUTPUT}
   };
 
+  private static final OutputState[][] unionOutputMatrix = new OutputState[][]{
+      {NOT_OUTPUT, OUTPUT},
+      {OUTPUT, OUTPUT}
+  };
+
   public int valueOf() {
     return numState;
   }
@@ -40,8 +45,11 @@ public enum OutputState {
   }
 
   public static OutputState and(OutputState o1, OutputState o2) {
-//    TODO: Refactor to work as OUTPUT.and(NOT_OUTPUT)
     return andOutputMatrix[o1.valueOf() - 3][o2.valueOf() - 3];
+  }
+
+  public static OutputState union(OutputState o1, OutputState o2) {
+    return unionOutputMatrix[o1.valueOf() - 3][o2.valueOf() - 3];
   }
 
   /**
