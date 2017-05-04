@@ -385,7 +385,8 @@ public class Cube {
 
   /**
    * Warning: This function is not used in {@link Cover#union(Cover)}.
-   * This is a coordinatewise union.
+   * This function calculates a smallest {@link Cube} that will contain
+   * both this cube and the other cube.
    *
    * @param other {@link Cube}
    * @return {@link Cube}

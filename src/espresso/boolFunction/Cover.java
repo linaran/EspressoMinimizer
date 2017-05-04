@@ -12,6 +12,8 @@ import java.util.*;
 
 import static espresso.boolFunction.InputState.DONTCARE;
 import static espresso.boolFunction.InputState.ONE;
+import static espresso.boolFunction.OutputState.NOT_OUTPUT;
+import static espresso.boolFunction.OutputState.OUTPUT;
 
 /**
  * By definition cover is first set of cubes.
@@ -110,7 +112,7 @@ public class Cover implements Iterable<Cube> {
     return retValue;
   }
 
-  protected void checkCoverCompatibility(Cover other) {
+  private void checkCoverCompatibility(Cover other) {
     if (inputCount() != other.inputCount() || outputCount() != other.outputCount()) {
       throw new UnsupportedOperationException(
           "This operation can't be performed on these two covers. Their input or output counts are different."
@@ -135,6 +137,18 @@ public class Cover implements Iterable<Cube> {
 
     Cube retValue = new Cube(inputCount(), outputCount());
     retValue.setInput(ONE, inputIndex);
+
+    return retValue;
+  }
+
+  public Cube generateTautologyForOutput(int index) {
+    if (index < 0 || index >= outputCount()) {
+      throw new ArrayIndexOutOfBoundsException("Index out of bounds.");
+    }
+
+    Cube retValue = new Cube(inputCount(), outputCount());
+    retValue.outputComplement();
+    retValue.setOutput(OUTPUT, index);
 
     return retValue;
   }
