@@ -34,12 +34,14 @@ public final class Reduce {
         );
         Cube reducedCube = cube.and(smallestCubeContainingComplement);
 
-        reducedCubes.add(reducedCube);
-        reducedCubesIndexes.add(i);
+        retValue.remove(cube);
+        retValue.add(reducedCube);
+//        reducedCubes.add(reducedCube);
+//        reducedCubesIndexes.add(i);
       }
     }
 
-    applyReducedCubes(reducedCubes, reducedCubesIndexes, retValue);
+//    applyReducedCubes(reducedCubes, reducedCubesIndexes, retValue);
 
     return retValue;
   }
