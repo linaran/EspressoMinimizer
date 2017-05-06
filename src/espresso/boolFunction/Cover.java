@@ -94,6 +94,9 @@ public class Cover implements Iterable<Cube> {
   }
 
   public static Cover of(Cube... cubes) {
+    if (cubes.length == 0) {
+      throw new UnsupportedOperationException("At least one Cube must be given.");
+    }
     return new Cover(cubes);
   }
 
@@ -153,6 +156,11 @@ public class Cover implements Iterable<Cube> {
     return retValue;
   }
 
+  /**
+   * Param can be null. It just won't be added.
+   *
+   * @param cube {@link Cube}
+   */
   public void add(Cube cube) {
     cubes.add(cube);
   }
@@ -477,7 +485,7 @@ public class Cover implements Iterable<Cube> {
   }
 
   /**
-   * Method returns first new cover which is first simple union of both
+   * Method returns first new cover which is first simple smallestCubeContainingBoth of both
    * covers.
    *
    * @param other {@link Cover}.

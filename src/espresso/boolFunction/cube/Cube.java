@@ -6,6 +6,8 @@ import espresso.boolFunction.InputState;
 import espresso.boolFunction.OutputState;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static espresso.boolFunction.InputState.*;
 import static espresso.boolFunction.OutputState.*;
@@ -201,8 +203,16 @@ public class Cube {
     return input[index];
   }
 
+  public List<InputState> getInputState() {
+    return Collections.unmodifiableList(Arrays.asList(input));
+  }
+
   public OutputState getOutputState(int index) {
     return output[index];
+  }
+
+  public List<OutputState> getOutputState() {
+    return Collections.unmodifiableList(Arrays.asList(output));
   }
 
   public void setInput(InputState inputState, int i) {
@@ -384,14 +394,13 @@ public class Cube {
   }
 
   /**
-   * Warning: This function is not used in {@link Cover#union(Cover)}.
    * This function calculates a smallest {@link Cube} that will contain
    * both this cube and the other cube.
    *
    * @param other {@link Cube}
    * @return {@link Cube}
    */
-  public Cube union(Cube other) {
+  public Cube smallestCubeContainingBoth(Cube other) {
     if (input.length != other.input.length || output.length != other.output.length) {
       throw new UnsupportedOperationException("Cube lengths are not compatible.");
     }

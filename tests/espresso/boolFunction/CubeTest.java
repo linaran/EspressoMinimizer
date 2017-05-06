@@ -76,7 +76,7 @@ public class CubeTest {
     Cube cube2 = new Cube(new InputState[]{ONE, ONE, DONTCARE, ZERO}, new OutputState[]{OUTPUT, NOT_OUTPUT, OUTPUT});
 
     Cube expected = new Cube(new InputState[]{DONTCARE, ONE, DONTCARE, DONTCARE}, new OutputState[]{OUTPUT, OUTPUT, OUTPUT});
-    Cube actual = cube1.union(cube2);
+    Cube actual = cube1.smallestCubeContainingBoth(cube2);
 
     assertEquals(
         "Union calculation for cubes is wrong.",
