@@ -1,8 +1,8 @@
 package espresso.utils;
 
 /**
- * Simple class to return two different objects in some methods.
- * Don't put this into collections.
+ * I don't really recommend using this other than to maybe return two objects from methods.
+ * Even then see if it can be avoided.
  */
 public class Pair<A, B> {
   public final A first;
@@ -12,4 +12,5 @@ public class Pair<A, B> {
     this.first = first;
     this.second = second;
   }
+
 }
