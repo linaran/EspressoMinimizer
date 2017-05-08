@@ -15,8 +15,8 @@ public class SingleOutputCoverMatrix extends BooleanMatrix {
   }
 
   public Set<Integer> computeCoveringSet(
-      HashSet<Integer> loweringSet,
-      HashSet<Integer> raisingSet,
+      Set<Integer> loweringSet,
+      Set<Integer> raisingSet,
       int rowIndex
   ) {
     Set<Integer> coveringSet = new HashSet<>();

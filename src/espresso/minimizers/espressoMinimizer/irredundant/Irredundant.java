@@ -3,6 +3,7 @@ package espresso.minimizers.espressoMinimizer.irredundant;
 
 import espresso.boolFunction.Cover;
 import espresso.boolFunction.cube.Cube;
+import espresso.minimizers.espressoMinimizer.minColCover.MaxCliqueHeuristic;
 import espresso.utils.Pair;
 
 import java.util.*;
@@ -83,7 +84,8 @@ final public class Irredundant {
     NoCoverMatrix noCoverMatrix =
         calculateNoCoverMatrix(relativelyEssential, dontcareSet, partiallyRedundant);
 
-    Set<Integer> minColumnCover = minimumColumnCover(noCoverMatrix);
+    Set<Integer> minColumnCover =
+        MaxCliqueHeuristic.getInstance().calculateMinimumColumnCover(noCoverMatrix);
 
     List<Cube> retValue = new ArrayList<>();
     for (Integer index : minColumnCover) {
@@ -91,76 +93,6 @@ final public class Irredundant {
     }
 
     return retValue;
-  }
-
-  private static Set<Integer> minimumColumnCover(NoCoverMatrix noCoverMatrix) {
-    Set<Integer> columnCover = new HashSet<>();
-
-    noCoverMatrix.simplify();
-    IndependencyMatrix independencyMatrix = new IndependencyMatrix(noCoverMatrix);
-
-    Set<Integer> maxClique = independencyMatrix.computeMaxClique();
-    for (Integer rowIndex : maxClique) {
-      int maxColumnIndex = -1;
-      int maxTrueColumnCount = -1;
-
-      for (Iterator<Integer> iter = noCoverMatrix.ignoreColumnsIterator(); iter.hasNext(); ) {
-        int columnIndex = iter.next();
-        int trueColumnCount = noCoverMatrix.getTrueColumnCount(columnIndex, false);
-        if (noCoverMatrix.getElement(rowIndex, columnIndex) &&
-            trueColumnCount > maxTrueColumnCount
-            ) {
-          maxColumnIndex = columnIndex;
-          maxTrueColumnCount = trueColumnCount;
-        }
-      }
-
-      columnCover.add(maxColumnIndex);
-      columnChoiceCleanup(noCoverMatrix, maxColumnIndex);
-    }
-
-    if (!noCoverMatrix.isFullyIgnored()) {
-      columnCover.addAll(minimumColumnCover(noCoverMatrix));
-    } else {
-      weed(noCoverMatrix, columnCover);
-    }
-
-    return columnCover;
-  }
-
-  //  Every day.
-  private static void weed(NoCoverMatrix noCoverMatrix, Set<Integer> columnCover) {
-    List<Integer> columns = new ArrayList<>(columnCover);
-    int[] redundancyCounts = new int[columns.size()];
-
-    for (int i = 0; i < noCoverMatrix.getRowCount(); i++) {
-      int sum = 0;
-      for (Integer j : columnCover) {
-        sum += (noCoverMatrix.getElement(i, j) ? 1 : 0);
-      }
-
-      if (sum > 1) {
-        for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
-          int j = columns.get(columnIndex);
-
-          if (noCoverMatrix.getElement(i, j)) {
-            redundancyCounts[columnIndex]++;
-          }
-        }
-      }
-    }
-
-    List<Integer> redundantColumns = new ArrayList<>();
-    for (int i = 0; i < columns.size(); i++) {
-      if (redundancyCounts[i] == noCoverMatrix.getTrueColumnCount(columns.get(i))) {
-        redundantColumns.add(columns.get(i));
-      }
-    }
-
-    if (redundantColumns.size() != 0) {
-      columnCover.remove(redundantColumns.get(0));
-      weed(noCoverMatrix, columnCover);
-    }
   }
 
   private static void columnChoiceCleanup(NoCoverMatrix matrix, int columnIndex) {

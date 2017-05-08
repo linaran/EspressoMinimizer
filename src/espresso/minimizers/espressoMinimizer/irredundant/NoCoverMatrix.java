@@ -12,37 +12,4 @@ public class NoCoverMatrix extends BooleanMatrix {
     super(new NoCoverMatrixElementGenerator(minSets, columnCount));
   }
 
-  public void simplify() {
-    for (Iterator<Integer> iter1 = ignoreRowsIterator(); iter1.hasNext(); ) {
-      int rowIndex1 = iter1.next();
-      for (Iterator<Integer> iter2 = ignoreRowsIterator(); iter2.hasNext(); ) {
-        int rowIndex2 = iter2.next();
-
-        if (rowIndex1 != rowIndex2 && isSecondRowRedundant(rowIndex1, rowIndex2)) {
-          addIgnoredRows(rowIndex2);
-        }
-      }
-    }
-  }
-
-  private boolean isSecondRowRedundant(int firstRow, int secondRow) {
-    if (getTrueRowCount(firstRow) == 0 || getTrueRowCount(secondRow) == 0) {
-      throw new IllegalArgumentException(
-          "Boolean rows containing only false values are not allowed."
-      );
-    }
-
-    for (Iterator<Integer> iter1 = ignoreColumnsIterator(); iter1.hasNext(); ) {
-      int columnIndex = iter1.next();
-
-      boolean firstRowElement = getElement(firstRow, columnIndex);
-      boolean secondRowElement = getElement(secondRow, columnIndex);
-
-      if (firstRowElement && !secondRowElement) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 }

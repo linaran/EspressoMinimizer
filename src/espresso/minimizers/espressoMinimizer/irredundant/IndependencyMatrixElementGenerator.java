@@ -9,21 +9,16 @@ import java.util.Iterator;
 public class IndependencyMatrixElementGenerator implements MatrixElementGenerator {
 
   private BooleanMatrix matrix;
-  private int rowCount;
 
   public IndependencyMatrixElementGenerator(BooleanMatrix matrix) {
     this.matrix = matrix;
-    rowCount = matrix.getNotIgnoredRowCount();
   }
 
   @Override
-  public boolean generateElement(int rowIndex, int columnIndex) {
-    rowIndex = skipIgnoredRows(rowIndex);
-    columnIndex = skipIgnoredRows(columnIndex);
-
+  public boolean generateElement(int rowIndex1, int rowIndex2) {
     for (Iterator<Integer> iter = matrix.ignoreColumnsIterator(); iter.hasNext(); ) {
       int column = iter.next();
-      if (matrix.getElement(rowIndex, column) && matrix.getElement(columnIndex, column)) {
+      if (matrix.getElement(rowIndex1, column) && matrix.getElement(rowIndex2, column)) {
         return false;
       }
     }
@@ -31,22 +26,13 @@ public class IndependencyMatrixElementGenerator implements MatrixElementGenerato
     return true;
   }
 
-  private int skipIgnoredRows(int rowIndex) {
-    int i = rowIndex;
-    while (i < rowCount && !matrix.isRowIgnored(rowIndex)) {
-      ++i;
-    }
-
-    return i;
-  }
-
   @Override
   public int getRowCount() {
-    return rowCount;
+    return matrix.getRowCount();
   }
 
   @Override
   public int getColumnCount() {
-    return rowCount;
+    return matrix.getRowCount();
   }
 }

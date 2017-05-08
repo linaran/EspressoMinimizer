@@ -1,5 +1,6 @@
 package espresso.minimizers.espressoMinimizer.expand;
 
+import espresso.minimizers.espressoMinimizer.minColCover.MaxCliqueHeuristic;
 import espresso.minimizers.espressoMinimizer.utils.BooleanMatrix;
 import espresso.utils.Pair;
 import espresso.boolFunction.Cover;
@@ -9,8 +10,8 @@ import java.util.*;
 
 public final class Expand {
 
-  private static HashSet<Integer> loweringSet = new HashSet<>();
-  private static HashSet<Integer> raisingSet = new HashSet<>();
+  private static Set<Integer> loweringSet = new HashSet<>();
+  private static Set<Integer> raisingSet = new HashSet<>();
 
   private static void clearStatic() {
     loweringSet.clear();
@@ -71,7 +72,16 @@ public final class Expand {
     }
 
     if (!blockMatrix.isFullyIgnored()) {
-      throw new UnsupportedOperationException("Not finished yet. MinLow procedure.\n" + loweringSet.toString());
+//      loweringSet.addAll(
+//          MaxCliqueHeuristic.getInstance().calculateMinimumColumnCover(blockMatrix));
+      Set<Integer> otherColumns = new HashSet<>();
+      for (Iterator<Integer> iter = blockMatrix.ignoreColumnsIterator(); iter.hasNext(); ) {
+        otherColumns.add(iter.next());
+      }
+
+      MaxCliqueHeuristic.getInstance().weed(blockMatrix, otherColumns);
+
+      loweringSet.addAll(otherColumns);
     }
 
     List<Integer> containedRows = rowsContainedByLoweringSet(coverMatrix);

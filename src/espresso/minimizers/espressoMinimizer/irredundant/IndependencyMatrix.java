@@ -11,6 +11,9 @@ public class IndependencyMatrix extends BooleanMatrix {
 
   public IndependencyMatrix(BooleanMatrix matrix) {
     super(new IndependencyMatrixElementGenerator(matrix));
+
+    addIgnoredColumns(matrix.getIgnoredRows());
+    addIgnoredRows(matrix.getIgnoredRows());
   }
 
   public Set<Integer> computeMaxClique() {
