@@ -72,16 +72,8 @@ public final class Expand {
     }
 
     if (!blockMatrix.isFullyIgnored()) {
-//      loweringSet.addAll(
-//          MaxCliqueHeuristic.getInstance().calculateMinimumColumnCover(blockMatrix));
-      Set<Integer> otherColumns = new HashSet<>();
-      for (Iterator<Integer> iter = blockMatrix.ignoreColumnsIterator(); iter.hasNext(); ) {
-        otherColumns.add(iter.next());
-      }
-
-      MaxCliqueHeuristic.getInstance().weed(blockMatrix, otherColumns);
-
-      loweringSet.addAll(otherColumns);
+      loweringSet.addAll(
+          MaxCliqueHeuristic.getInstance().calculateMinimumColumnCover(blockMatrix));
     }
 
     List<Integer> containedRows = rowsContainedByLoweringSet(coverMatrix);

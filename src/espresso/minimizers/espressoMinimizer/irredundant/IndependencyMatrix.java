@@ -48,8 +48,8 @@ public class IndependencyMatrix extends BooleanMatrix {
   }
 
   private int rowIndexWithMaxTrueCount() {
-    int maxRowIndex = 0;
-    int maxTrueCount = 0;
+    int maxRowIndex = -1;
+    int maxTrueCount = -1;
 
     for (Iterator<Integer> iter = ignoreRowsIterator(); iter.hasNext(); ) {
       int rowIndex = iter.next();
