@@ -28,20 +28,22 @@ public class SingleOutputEspressoMinimizer implements BooleanOnSetDontCareMinimi
 
     Cover offSet = onSet.complement(dontcareSet);
 
-    Cover latestOnSet = new Cover(onSet);
+    Cover currentOnSet = new Cover(onSet);
+    Cover latestMinSet = new Cover(onSet);
     int killCount = 5;
     while (true) {
-      Cover expandedOnSet = Expand.expandCover(latestOnSet, offSet);
+      Cover expandedOnSet = Expand.expandCover(currentOnSet, offSet);
       Cover irredundantSet = Irredundant.irredundantCover(expandedOnSet, dontcareSet);
 
       int irredundantSize = irredundantSet.size();
       int irredundantLiteralCount = irredundantSet.literalCount();
 
-      int latestSize = latestOnSet.size();
-      int latestLiteralCount = latestOnSet.literalCount();
+      int latestSize = latestMinSet.size();
+      int latestLiteralCount = latestMinSet.literalCount();
 
       if (irredundantSize < latestSize || irredundantLiteralCount < latestLiteralCount) {
-        latestOnSet = Reduce.reduce(irredundantSet, dontcareSet);
+        currentOnSet = Reduce.reduce(irredundantSet, dontcareSet);
+        latestMinSet = irredundantSet;
       } else if (killCount > 0) {
         killCount--;
       } else {
@@ -49,7 +51,7 @@ public class SingleOutputEspressoMinimizer implements BooleanOnSetDontCareMinimi
       }
     }
 
-    return latestOnSet;
+    return latestMinSet;
   }
 
   @Override
