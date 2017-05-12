@@ -193,6 +193,10 @@ public class CubeArray implements Iterable<Cube> {
     return new CubeArrayIterator();
   }
 
+  public void shuffle() {
+    Collections.shuffle(list);
+  }
+
   /**
    * A wrapper around default {@link ArrayList} iterator in order to properly maintain
    * {@link CubeArray#bitCount} values.

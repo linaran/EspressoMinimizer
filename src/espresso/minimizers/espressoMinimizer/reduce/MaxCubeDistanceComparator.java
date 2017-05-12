@@ -4,6 +4,7 @@ package espresso.minimizers.espressoMinimizer.reduce;
 import espresso.boolFunction.cube.Cube;
 
 import java.util.Comparator;
+import java.util.Random;
 
 public final class MaxCubeDistanceComparator implements Comparator<Cube> {
 
@@ -18,7 +19,15 @@ public final class MaxCubeDistanceComparator implements Comparator<Cube> {
     Integer distance1 = pseudoDistanceToMaxCube(o1);
     Integer distance2 = pseudoDistanceToMaxCube(o2);
 
-    return distance1.compareTo(distance2);
+    int comparisonResult = distance1.compareTo(distance2);
+
+    if (comparisonResult == 0) {
+      Random random = new Random();
+//      Return random -1, 0, 1
+      return random.nextInt(3) - 1;
+    } else {
+      return comparisonResult;
+    }
   }
 
   private int pseudoDistanceToMaxCube(Cube other) {

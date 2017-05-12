@@ -16,20 +16,21 @@ public class ReduceCubeOrder {
     return instance;
   }
 
-  private Pair<Integer, Cube> maxCubeIndex(Cover cover) {
-    Integer maxCubeIndex = 0;
-    Cube maxCube = cover.get(0);
+  private int maxCubeIndex(Cover cover) {
+    int maxCubeIndex = 0;
+    boolean isIndexChosen = false;
 
     for (int i = 0; i < cover.size(); i++) {
       Cube cube = cover.get(i);
+      Cube maxCube = cover.get(maxCubeIndex);
 
       if (maxCube.dontcareCount() < cube.dontcareCount()) {
-        maxCube = cube;
         maxCubeIndex = i;
+        isIndexChosen = true;
       }
     }
 
-    return new Pair<>(maxCubeIndex, maxCube);
+    return isIndexChosen ? maxCubeIndex : -1;
   }
 
   /**
@@ -38,12 +39,14 @@ public class ReduceCubeOrder {
    * @param cover {@link Cover}
    */
   public void organize(Cover cover) {
-    Pair<Integer, Cube> pair = maxCubeIndex(cover);
-    Integer maxCubeIndex = pair.first;
-    Cube maxCube = pair.second;
+    int maxCubeIndex = maxCubeIndex(cover);
 
-    cover.swapCubes(maxCubeIndex, 0);
-
-    cover.sort(new MaxCubeDistanceComparator(maxCube));
+    if (maxCubeIndex != -1) {
+      Cube maxCube = cover.get(maxCubeIndex);
+      cover.swapCubes(maxCubeIndex, 0);
+      cover.sort(new MaxCubeDistanceComparator(maxCube));
+    } else {
+      cover.shuffle();
+    }
   }
 }

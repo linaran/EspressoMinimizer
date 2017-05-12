@@ -215,6 +215,10 @@ public class Cover implements Iterable<Cube> {
     cubes.sort(comparator);
   }
 
+  public void shuffle() {
+    cubes.shuffle();
+  }
+
   /**
    * Number of cubes in the cover.
    *
