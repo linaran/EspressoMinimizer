@@ -219,6 +219,10 @@ public class Cover implements Iterable<Cube> {
     cubes.shuffle();
   }
 
+  public void shuffle(long seed) {
+    cubes.shuffle(seed);
+  }
+
   /**
    * Number of cubes in the cover.
    *
@@ -252,6 +256,16 @@ public class Cover implements Iterable<Cube> {
 
   public int getZeroColumnCount(int i) {
     return cubes.getZeroColumnCount(i);
+  }
+
+  public int literalCount() {
+    int retValue = 0;
+
+    for (int i = 0; i < inputCount(); i++) {
+      retValue += getOneColumnCount(i) + getZeroColumnCount(i);
+    }
+
+    return retValue;
   }
 
   /**

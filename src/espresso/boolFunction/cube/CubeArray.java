@@ -197,6 +197,12 @@ public class CubeArray implements Iterable<Cube> {
     Collections.shuffle(list);
   }
 
+  public void shuffle(long seed) {
+    Random random = new Random();
+    random.setSeed(seed);
+    Collections.shuffle(list, random);
+  }
+
   /**
    * A wrapper around default {@link ArrayList} iterator in order to properly maintain
    * {@link CubeArray#bitCount} values.
