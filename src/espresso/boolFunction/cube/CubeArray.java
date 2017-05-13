@@ -194,6 +194,7 @@ public class CubeArray implements Iterable<Cube> {
   }
 
   public void shuffle() {
+//    Seed 400 for demonstration on notMinimalTestCase1
     Collections.shuffle(list);
   }
 
