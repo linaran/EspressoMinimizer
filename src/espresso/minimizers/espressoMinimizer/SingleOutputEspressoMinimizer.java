@@ -2,6 +2,7 @@ package espresso.minimizers.espressoMinimizer;
 
 
 import espresso.boolFunction.Cover;
+import espresso.boolFunction.cube.Cube;
 import espresso.minimizers.espressoMinimizer.expand.Expand;
 import espresso.minimizers.espressoMinimizer.irredundant.Irredundant;
 import espresso.minimizers.espressoMinimizer.reduce.Reduce;
@@ -26,7 +27,15 @@ public class SingleOutputEspressoMinimizer implements BooleanOnSetDontCareMinimi
       );
     }
 
+    if (onSet.size() == 0) {
+      return new Cover(onSet);
+    }
+
     Cover offSet = onSet.complement(dontcareSet);
+    if (offSet.size() == 0) {
+//      Given cover is tautology.
+      return new Cover(new Cube(onSet.inputCount(), onSet.outputCount()));
+    }
 
     Cover currentOnSet = new Cover(onSet);
     Cover latestMinSet = new Cover(onSet);
