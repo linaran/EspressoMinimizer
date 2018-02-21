@@ -7,4 +7,4 @@
 ## Done so far
 * Classes (use Cover and Cube) to model boolean functions. Check test cases for usage.
 * Minimization algorithm Simplify for single output boolean functions. It's been tested on several cases and it seems to work. This minimizer is faster than Espresso but less powerful so to say.
-* A crippled version of Espresso minimization algorithm lives! This crippled version consists of single Expand and Irredundant step. So it will (as much as possible) expand all implicants into prime implicants and then remove redundant prime implicants.
+* A basic Expand-Irredundant-Reduce Espresso algorithm for single output functions has been implemented and tested on smaller functions for correctness regarding minimization. Check out examples to see how to invoke the algorithm.
